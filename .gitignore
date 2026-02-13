@@ -1,0 +1,38 @@
+# Build directories
+build/
+cmake-build-*/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Compiled files
+*.o
+*.so
+*.a
+*.exe
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# vcpkg
+vcpkg_installed/
+
+# External dependencies (if manually added)
+external/eccodes/lib/*.so*
+external/eccodes/lib/*.a
+
+# Sample data
+*.grib
+*.grib2
+*.grb
+
+# OS
+.DS_Store
+Thumbs.db
