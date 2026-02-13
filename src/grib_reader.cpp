@@ -89,14 +89,20 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     CODES_CHECK(codes_get_string(h, "units", buffer, &len), 0);
     field.units = std::string(buffer);
 
+    len = 256;
+    CODES_CHECK(codes_get_string(h, "indicatorOfTypeOfLevel", buffer, &len), 0);
+    field.indicatorOfTypeOfLevel = std::string(buffer);
+
     // Get dimensions
-    long nx, ny, level;
+    long nx, ny, level, indicatorOfParameter;
     CODES_CHECK(codes_get_long(h, "Ni", &nx), 0);
     CODES_CHECK(codes_get_long(h, "Nj", &ny), 0);
     CODES_CHECK(codes_get_long(h, "level", &level), 0);
+    CODES_CHECK(codes_get_long(h, "indicatorOfParameter", &indicatorOfParameter), 0);
     field.width = static_cast<size_t>(nx);
     field.height = static_cast<size_t>(ny);
     field.level = static_cast<size_t>(level);
+    field.indicatorOfParameter = static_cast<size_t>(indicatorOfParameter);
     
     // Get values
     size_t values_len = 0;

@@ -8,9 +8,11 @@ struct GribField {
     std::string name;
     std::string shortName;
     std::string units;
+    std::string indicatorOfTypeOfLevel;
     size_t level;
     size_t width;
     size_t height;
+    size_t indicatorOfParameter;
     std::vector<double> values;
     double min_value;
     double max_value;
