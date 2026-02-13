@@ -113,7 +113,8 @@ int main(int argc, char** argv) {
             ImGui::Separator();
 
             // Field information
-            ImGui::Text("Field: %s (%s)", currentField.name.c_str(), currentField.shortName.c_str());
+            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %zu) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
+                        currentField.indicatorOfParameter, currentField.indicatorOfTypeOfLevel.c_str());
             ImGui::Text("Level: %zu", currentField.level);
             ImGui::Text("Units: %s", currentField.units.c_str());
             ImGui::Text("Dimensions: %zu x %zu", currentField.width, currentField.height);
@@ -123,9 +124,12 @@ int main(int argc, char** argv) {
 
             // Visualization
             ImGui::Text("Visualization:");
+            static int displayFactor = 1;
+            ImGui::SliderInt("Display Zoom Factor", &displayFactor, 1, 10);
             ImGui::BeginChild("Visualization", ImVec2(0, 0), true);
             
-            int displayWidth = currentField.width * 2;
+            
+            int displayWidth = currentField.width * displayFactor;
             int dislayHeight = displayWidth * currentField.height / currentField.width; 
             renderer.renderField(currentField, displayWidth, dislayHeight);
             
