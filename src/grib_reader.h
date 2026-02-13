@@ -1,5 +1,10 @@
 #pragma once
 
+#include <eccodes.h>
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
 #include <string>
 #include <vector>
 #include <memory>

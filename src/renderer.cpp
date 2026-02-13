@@ -1,10 +1,5 @@
 #include "renderer.h"
-#include <imgui.h>
-#include <algorithm>
-#include <cmath>
-#include <iostream>
 
-#include "gradient.h"
 
 Renderer::Renderer() {
 }
@@ -23,7 +18,7 @@ Color valueToColor(double value, double min_val, double max_val, const Gradient&
 }
 
 
-void Renderer::renderField(const GribField& field, int displayWidth, int displayHeight) {
+void Renderer::renderField(const GribField& field, int displayWidth, int displayHeight, GribViewerSettings& settings) {
     if (field.values.empty() || field.width == 0 || field.height == 0) {
         ImGui::Text("No data to display");
         return;
@@ -38,7 +33,7 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
     float pixel_width = static_cast<float>(displayWidth) / field.width;
     float pixel_height = static_cast<float>(displayHeight) / field.height;
     
-    const Gradient gradient = YlGnBu();
+    // const Gradient gradient = mpl_gradients::rainbow;
     
     // Draw each grid cell
     for (size_t y = 0; y < field.height; ++y) {
@@ -47,7 +42,7 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
             if (idx >= field.values.size()) continue;
             
             double value = field.values[idx];
-            Color color = valueToColor(value, field.min_value, field.max_value, gradient);
+            Color color = valueToColor(value, field.min_value, field.max_value, settings.gradient);
             // if (x % 50 == 0 && y % 50 == 0) {
             //     std::cout << "Value: " << value << " Color: (" << color.r << ", " << color.g << ", " << color.b << ")\n";
             // }

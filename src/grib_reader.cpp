@@ -1,8 +1,5 @@
 #include "grib_reader.h"
-#include <eccodes.h>
-#include <algorithm>
-#include <cmath>
-#include <iostream>
+
 
 GribReader::GribReader() : fileHandle(nullptr) {
 }

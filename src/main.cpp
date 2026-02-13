@@ -8,6 +8,7 @@
 #include "grib_reader.h"
 #include "renderer.h"
 #include "settings.h"
+#include "mpl_gradients.h"
 
 static void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -70,7 +71,6 @@ int main(int argc, char** argv) {
         static GribViewerSettings settings;
         glfwPollEvents();
 
-
         // Start ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -130,12 +130,31 @@ int main(int argc, char** argv) {
             // Visualization
             ImGui::Text("Visualization:");
             ImGui::SliderInt("Display Zoom Factor", &settings.displayZoomFactor, 1, 10);
+            static int current = 0;
+            if (ImGui::BeginCombo("Gradient", mpl_gradient_names[current].c_str()))
+            {
+                for (int i = 0; i < mpl_gradient_names.size(); ++i)
+                {
+                    bool is_selected = (current == i);
+
+                    if (ImGui::Selectable(mpl_gradient_names[i].c_str(), is_selected))
+                    {
+                        current = i;
+                        settings.gradient = mpl_gradients[i];
+                    }
+
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+}
             ImGui::BeginChild("Visualization", ImVec2(0, 0), true);
             
             
             int displayWidth = currentField.width * settings.displayZoomFactor;
             int displayHeight = displayWidth * currentField.height / currentField.width; 
-            renderer.renderField(currentField, displayWidth, displayHeight);
+            renderer.renderField(currentField, displayWidth, displayHeight, settings);
             
             ImGui::EndChild();
         } else {
