@@ -4,8 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
+
 #include "grib_reader.h"
 #include "renderer.h"
+#include "settings.h"
 
 static void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -65,7 +67,9 @@ int main(int argc, char** argv) {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+        static GribViewerSettings settings;
         glfwPollEvents();
+
 
         // Start ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -104,6 +108,7 @@ int main(int argc, char** argv) {
         ImGui::Separator();
 
         if (fileLoaded && messageCount > 0) {
+
             // Message selection
             ImGui::Text("Message: %d / %d", currentMessage + 1, messageCount);
             if (ImGui::SliderInt("##message", &currentMessage, 0, messageCount - 1)) {
@@ -124,14 +129,13 @@ int main(int argc, char** argv) {
 
             // Visualization
             ImGui::Text("Visualization:");
-            static int displayFactor = 1;
-            ImGui::SliderInt("Display Zoom Factor", &displayFactor, 1, 10);
+            ImGui::SliderInt("Display Zoom Factor", &settings.displayZoomFactor, 1, 10);
             ImGui::BeginChild("Visualization", ImVec2(0, 0), true);
             
             
-            int displayWidth = currentField.width * displayFactor;
-            int dislayHeight = displayWidth * currentField.height / currentField.width; 
-            renderer.renderField(currentField, displayWidth, dislayHeight);
+            int displayWidth = currentField.width * settings.displayZoomFactor;
+            int displayHeight = displayWidth * currentField.height / currentField.width; 
+            renderer.renderField(currentField, displayWidth, displayHeight);
             
             ImGui::EndChild();
         } else {
