@@ -56,15 +56,24 @@ set(SOURCES
     src/main.cpp
     src/grib_reader.cpp
     src/renderer.cpp
+    src/mpl_gradients.cpp
 )
 
 set(HEADERS
     src/grib_reader.h
     src/renderer.h
+    src/mpl_gradients.h
+    src/gradient.h
+    src/settings.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
+set_source_files_properties(
+    src/your_colormap_file.cpp
+    PROPERTIES
+    COMPILE_FLAGS "-O0 -g0"
+)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/src
