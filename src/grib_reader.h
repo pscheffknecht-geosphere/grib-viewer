@@ -34,8 +34,13 @@ public:
     void close();
     
     int getMessageCount() const;
+    bool get_value(const codes_handle* h, const char* value_name, const int* value, const int& len);
     bool readField(int messageIndex, GribField& field);
-    
+
+    bool readCode(codes_handle* h, char* name, std::string& value);
+    bool readCode(codes_handle* h, char* name, long& value);
+    void readValue(size_t& len, codes_handle* h, char buffer[256], GribField& field);
+
     const std::string& getLastError() const { return lastError; }
     
 private:
