@@ -19,6 +19,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         -Wextra
         -Wpedantic
         -Wno-unused-parameter
+        -march=native
     )
     
     # Debug flags
