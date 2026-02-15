@@ -49,7 +49,7 @@ int GribReader::getMessageCount() const {
     return count;
 }
 
-bool GribReader::readCode(codes_handle* h, char* name, std::string& value) {
+bool GribReader::readCode(codes_handle* h, const char* name, std::string& value) {
     if (codes_is_defined(h, name) == true) {
         size_t len = 256;
         char buffer[256];
@@ -61,7 +61,7 @@ bool GribReader::readCode(codes_handle* h, char* name, std::string& value) {
     else return false;
 }
 
-bool GribReader::readCode(codes_handle* h, char* name, long& value) {
+bool GribReader::readCode(codes_handle* h, const char* name, long& value) {
     if (codes_is_defined(h, name) == true) {
         CODES_CHECK(codes_get_long(h, name, &value), 0);
         return true;
@@ -95,36 +95,37 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     size_t len = 256;
     char buffer[256];
     
-    CODES_CHECK(codes_get_string(h, "name", buffer, &len), 0);
-    field.name = std::string(buffer);
+    // CODES_CHECK(codes_get_string(h, "name", buffer, &len), 0);
+    if (! readCode(h, "name", field.name))
+        field.name = "VOID";
     
     len = 256;
-    CODES_CHECK(codes_get_string(h, "shortName", buffer, &len), 0);
-    field.shortName = std::string(buffer);
+    // CODES_CHECK(codes_get_string(h, "shortName", buffer, &len), 0);
+    if (! readCode(h, "shortName", field.shortName))
+        field.shortName = "VOID";
     
     len = 256;
-    CODES_CHECK(codes_get_string(h, "units", buffer, &len), 0);
-    field.units = std::string(buffer);
+    // CODES_CHECK(codes_get_string(h, "units", buffer, &len), 0);
+    if (! readCode(h, "units", field.units))
+        field.units = "void";
 
     len = 256;
-    std::cout << "???\n";
-    if (codes_is_defined(h, "indicatorOfTypeOfLevel") == true) 
-    {
-        std::cout << "Found indicatorOfTypeOfLevel in file\n";
-        CODES_CHECK(codes_get_string(h, "indicatorOfTypeOfLevel", buffer, &len), 0);
-        field.indicatorOfTypeOfLevel = std::string(buffer);
-    }
+    if (! readCode(h, "indicatorOfTypeOfLevel", field.indicatorOfTypeOfLevel))
+        field.indicatorOfTypeOfLevel = "VOID";
 
     // Get dimensions
-    long nx, ny, level, indicatorOfParameter;
-    CODES_CHECK(codes_get_long(h, "Ni", &nx), 0);
-    CODES_CHECK(codes_get_long(h, "Nj", &ny), 0);
-    CODES_CHECK(codes_get_long(h, "level", &level), 0);
-    // CODES_CHECK(codes_get_long(h, "indicatorOfParameter", &indicatorOfParameter), 0);
-    field.width = static_cast<size_t>(nx);
-    field.height = static_cast<size_t>(ny);
-    field.level = static_cast<size_t>(level);
-    field.indicatorOfParameter = static_cast<size_t>(indicatorOfParameter);
+    if (! readCode(h, "Ni", field.width))
+        field.discipline = -1;
+    if (! readCode(h, "Nj", field.height))
+        field.discipline = -1;
+    if (! readCode(h, "level", field.level))
+        field.discipline = -1;
+    if (! readCode(h, "discipline", field.discipline))
+        field.discipline = -1;
+    if (! readCode(h, "parameterNumber", field.parameterNumber))
+        field.parameterNumber = -1;
+    if (! readCode(h, "indicatorOfParameter", field.indicatorOfParameter))
+        field.indicatorOfParameter = 9999;
     
     // Get values
     size_t values_len = 0;
