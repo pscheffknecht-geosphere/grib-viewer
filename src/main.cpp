@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
     bool fileLoaded = false;
     char filename[512] = "";
     int currentMessage = 0;
+    int previousMessage = -1;
     int messageCount = 0;
 
     // Load file from command line if provided
@@ -111,19 +112,22 @@ int main(int argc, char** argv) {
 
             // Message selection
             ImGui::Text("Message: %d / %d", currentMessage + 1, messageCount);
-            if (ImGui::SliderInt("##message", &currentMessage, 0, messageCount - 1)) {
+            ImGui::SliderInt("##message", &currentMessage, 0, messageCount - 1);
+            if (currentMessage != previousMessage) {
                 reader.readField(currentMessage, currentField);
+                previousMessage = currentMessage;
+                
             }
 
             ImGui::Separator();
 
             // Field information
-            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %zu) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
+            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %d) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
                         currentField.indicatorOfParameter, currentField.indicatorOfTypeOfLevel.c_str());
-            ImGui::Text("Level: %zu", currentField.level);
+            ImGui::Text("Level: %d", currentField.level);
             ImGui::Text("Units: %s", currentField.units.c_str());
-            ImGui::Text("Dimensions: %zu x %zu", currentField.width, currentField.height);
-            ImGui::Text("Value range: %.2f to %.2f", currentField.min_value, currentField.max_value);
+            ImGui::Text("Dimensions: %d x %d", currentField.width, currentField.height);
+            ImGui::Text("Value range: %.6f to %.6f", currentField.min_value, currentField.max_value);
 
             ImGui::Separator();
 
