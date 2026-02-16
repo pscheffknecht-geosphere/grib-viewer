@@ -189,6 +189,7 @@ int main(int argc, char** argv) {
                 imgData.resize(displayHeight * displayWidth);
                 fieldTexture = renderer.createTexture(displayWidth, displayHeight);
                 needNewTexture = false;
+                updateImg = true;
             }
 
             if (updateImg) {
