@@ -80,6 +80,14 @@ int main(int argc, char** argv) {
             messageCount = reader.getMessageCount();
             if (messageCount > 0) {
                 reader.readField(0, currentField);
+                if (currentField.jScansPositively == 1) {
+                    yScanDirectionA = ImVec2(0, 1);
+                    yScanDirectionB = ImVec2(1, 0);
+                }
+                else {
+                    yScanDirectionA = ImVec2(0, 0);
+                    yScanDirectionB = ImVec2(1, 1);
+                }
             }
         }
     }
@@ -118,14 +126,13 @@ int main(int argc, char** argv) {
                 currentMessage = 0;
                 if (messageCount > 0) {
                     reader.readField(currentMessage, currentField);
-                    if (currentField.yScansNegatively) {
+                    if (currentField.jScansPositively == 1) {
                         yScanDirectionA = ImVec2(0, 1);
                         yScanDirectionB = ImVec2(1, 0);
                     }
                     else {
                         yScanDirectionA = ImVec2(0, 0);
                         yScanDirectionB = ImVec2(1, 1);
-
                     }
                 }
             } else {
@@ -152,6 +159,8 @@ int main(int argc, char** argv) {
             // Field information
             ImGui::Text("Field: %s (%s) (indicatorOfParameter: %d) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
                         currentField.indicatorOfParameter, currentField.indicatorOfTypeOfLevel.c_str());
+            ImGui::Text("    parameterNumber = %d, category = %d, discipline = %d", currentField.parameterNumber, 
+                currentField.parameterCategory, currentField.discipline);
             ImGui::Text("Level: %d", currentField.level);
             ImGui::Text("Units: %s", currentField.units.c_str());
             ImGui::Text("Dimensions: %d x %d", currentField.width, currentField.height);
@@ -231,7 +240,7 @@ int main(int argc, char** argv) {
                 updateCbarTexture = false;
             }
             ImGui::Image((ImTextureID)(intptr_t)cbarTexture, ImVec2(cbarWidth, cbarHeight));
-            ImGui::Image((ImTextureID)(intptr_t)fieldTexture, ImVec2(displayWidth, displayHeight)); //, ImVec2(0,1), ImVec2(0, 1)); //yScanDirection); // uv1);
+            ImGui::Image((ImTextureID)(intptr_t)fieldTexture, ImVec2(displayWidth, displayHeight), yScanDirectionA, yScanDirectionB);
 
             
             ImGui::EndChild();

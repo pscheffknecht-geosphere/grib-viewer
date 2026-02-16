@@ -134,10 +134,12 @@ bool GribReader::readField(int messageIndex, GribField& field) {
         field.discipline = -1;
     if (! readCode(h, "parameterNumber", field.parameterNumber))
         field.parameterNumber = -1;
+    if (! readCode(h, "parameterCategory", field.parameterCategory))
+        field.parameterCategory = -1;
     if (! readCode(h, "indicatorOfParameter", field.indicatorOfParameter))
         field.indicatorOfParameter = 9999;
-    if (! readCode(h, "yScansNegatively", field.yScansNegatively))
-        field.yScansNegatively = false;
+    if (! readCode(h, "jScansPositively", field.jScansPositively))
+        field.jScansPositively = false;
     
     // Get values
     size_t values_len = 0;

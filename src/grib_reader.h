@@ -21,11 +21,11 @@ struct GribField {
     long indicatorOfParameter;
     long parameterNumber;
     long discipline;
-    long category;
+    long parameterCategory;
     std::vector<double> values;
     double min_value;
     double max_value;
-    bool yScansNegatively = false;
+    bool jScansPositively = true;
     
     GribField() : width(0), height(0), min_value(0.0), max_value(0.0) {}
 };
