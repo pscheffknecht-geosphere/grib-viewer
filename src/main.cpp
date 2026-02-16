@@ -197,10 +197,14 @@ int main(int argc, char** argv) {
                     previousGradient = currentGradient;
                 }
             }
+
+
             ImGui::BeginChild("Visualization", ImVec2(0, 0), true);
             
             if (settings != settings_old) {
                 needNewTexture = true;
+                if (settings.sqrtScale != settings_old.sqrtScale)
+                    updateCbarTexture = true;
                 settings_old = settings;
             }
             
@@ -208,6 +212,8 @@ int main(int argc, char** argv) {
                 displayWidth = currentField.width * settings.displayZoomFactor;
                 displayHeight = displayWidth * currentField.height / currentField.width; 
                 imgData.resize(displayHeight * displayWidth);
+                glDeleteTextures(1, &fieldTexture);
+                fieldTexture = 0;
                 fieldTexture = renderer.createTexture(displayWidth, displayHeight);
                 needNewTexture = false;
                 updateImg = true;
