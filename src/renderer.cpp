@@ -103,3 +103,17 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
         }
     }
 }
+
+void Renderer::updateCbar(GLuint texture, const int width, const int height, std::vector<Color>& data,
+    GribViewerSettings& settings) {
+    
+    for (uint y = 0; y < height; y++) {
+        for (uint x = 0; x < width; x++) {
+            uint idx = y * width + x;
+            float cidx = float(x) / float(width - 1);
+            cidx = std::clamp(cidx, 0.f, 1.f);
+            if (settings.sqrtScale) cidx = sqrt(cidx);
+            data[idx] = settings.gradient.get_color(cidx);
+        }
+    }
+}

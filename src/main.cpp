@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
     int previousMessage = -1;
     int messageCount = 0;
 
+    // stuff for the main image
     GLuint fieldTexture;
     bool needNewTexture = true;
     int displayWidth = 0;
@@ -62,6 +63,14 @@ int main(int argc, char** argv) {
     std::vector<Color> imgData;
     ImVec2 yScanDirectionA = ImVec2(0, 0);
     ImVec2 yScanDirectionB = ImVec2(1, 1);
+
+    // add a color bar
+    bool updateCbarTexture = true;
+    int cbarHeight = 20;
+    int cbarWidth = 500;
+    GLuint cbarTexture = renderer.createTexture(cbarWidth, cbarHeight);
+    std::vector<Color> cbarData;
+    cbarData.resize(cbarWidth * cbarHeight);
 
     // Load file from command line if provided
     if (argc > 1) {
@@ -159,10 +168,10 @@ int main(int argc, char** argv) {
                 previousZoomFactor = settings.displayZoomFactor;
             }
             ImGui::Checkbox("Use custom min and max", &settings.useCustomMinMax);
-            ImGui::InputFloat("Minimum", &settings.minVal);
-            ImGui::InputFloat("Maximum", &settings.maxVal);
+            ImGui::InputFloat("Minimum", &settings.minVal, 0.f, 0.f, "%.8f");
+            ImGui::InputFloat("Maximum", &settings.maxVal, 0.f, 0.f, "%.8f");
             ImGui::Checkbox("Use sqrt scaling", &settings.sqrtScale);
-            
+
             static int currentGradient = 0;
             static int previousGradient = 0;
             if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))
@@ -184,6 +193,7 @@ int main(int argc, char** argv) {
                 ImGui::EndCombo();
                 if (currentGradient != previousGradient) {
                     needNewTexture = true;
+                    updateCbarTexture = true;
                     previousGradient = currentGradient;
                 }
             }
@@ -208,7 +218,16 @@ int main(int argc, char** argv) {
                 renderer.updateTexture(fieldTexture, displayWidth, displayHeight, imgData);
                 updateImg = false;
             }
+
+            if (updateCbarTexture) {
+                renderer.updateCbar(cbarTexture, cbarWidth, cbarHeight, cbarData, settings);
+                renderer.updateTexture(cbarTexture, cbarWidth, cbarHeight, cbarData);
+                updateCbarTexture = false;
+            }
+            ImGui::Image((ImTextureID)(intptr_t)cbarTexture, ImVec2(cbarWidth, cbarHeight));
             ImGui::Image((ImTextureID)(intptr_t)fieldTexture, ImVec2(displayWidth, displayHeight)); //, ImVec2(0,1), ImVec2(0, 1)); //yScanDirection); // uv1);
+
+            
             ImGui::EndChild();
         } else {
             ImGui::Text("No GRIB file loaded.");
