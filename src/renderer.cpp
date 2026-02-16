@@ -7,6 +7,62 @@ Renderer::Renderer() {
 Renderer::~Renderer() {
 }
 
+GLuint Renderer::createTexture(const int displayWidth, const int displayHeight) {
+    GLuint tex = 0;
+
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    // Filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Wrapping (important to define explicitly)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Allocate storage (NO DATA YET)
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,                  // mip level
+        GL_RGB32F,          // internal format (float texture)
+        displayWidth,
+        displayHeight,
+        0,
+        GL_RGB,             // format of incoming data
+        GL_FLOAT,           // type
+        nullptr             // no data yet
+    );
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return tex;
+}
+
+void Renderer::updateTexture(GLuint texture,
+                             int width,
+                             int height,
+                             const std::vector<Color>& data)
+{
+    if (data.size() != static_cast<size_t>(width * height))
+        return; // or assert
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexSubImage2D(
+        GL_TEXTURE_2D,
+        0,              // mip level
+        0, 0,           // xoffset, yoffset
+        width,
+        height,
+        GL_RGB,
+        GL_FLOAT,
+        data.data()
+    );
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 Color valueToColor(double value, double min_val, double max_val, const Gradient& gradient) {
     // Normalize value to 0-1
     double normalized = (value - min_val) / (max_val - min_val);
@@ -18,44 +74,25 @@ Color valueToColor(double value, double min_val, double max_val, const Gradient&
 }
 
 
-void Renderer::renderField(const GribField& field, int displayWidth, int displayHeight, GribViewerSettings& settings) {
+void Renderer::renderField(const GribField& field, int displayWidth, int displayHeight, 
+    GribViewerSettings& settings, std::vector<Color>& imgData) {
     if (field.values.empty() || field.width == 0 || field.height == 0) {
         ImGui::Text("No data to display");
         return;
     }
     
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
-    
-    //Gradient gradient = YlGnBu;
+    // Fill each pixel
+    for (size_t y = 0; y < displayHeight; ++y) {
+        for (size_t x = 0; x < displayWidth; ++x) {
+            
+            int fieldPosX = x * field.width / displayWidth;
+            int fieldPosY = y * field.height / displayHeight;
+            size_t idxField = field.width * fieldPosY + fieldPosX;
+            size_t idxImg = y * displayWidth + x;
 
-    // Calculate pixel size
-    float pixel_width = static_cast<float>(displayWidth) / field.width;
-    float pixel_height = static_cast<float>(displayHeight) / field.height;
-    
-    // const Gradient gradient = mpl_gradients::rainbow;
-    
-    // Draw each grid cell
-    for (size_t y = 0; y < field.height; ++y) {
-        for (size_t x = 0; x < field.width; ++x) {
-            size_t idx = (field.height - 1 - y) * field.width + x;
-            if (idx >= field.values.size()) continue;
+            double value = field.values[idxField];
+            imgData[idxImg] = valueToColor(value, field.min_value, field.max_value, settings.gradient);
             
-            double value = field.values[idx];
-            Color color = valueToColor(value, field.min_value, field.max_value, settings.gradient);
-            // if (x % 50 == 0 && y % 50 == 0) {
-            //     std::cout << "Value: " << value << " Color: (" << color.r << ", " << color.g << ", " << color.b << ")\n";
-            // }
-            ImVec2 p_min(canvas_pos.x + x * pixel_width, 
-                        canvas_pos.y + y * pixel_height);
-            ImVec2 p_max(canvas_pos.x + (x + 1) * pixel_width, 
-                        canvas_pos.y + (y + 1) * pixel_height);
-            
-            ImU32 col = ImGui::ColorConvertFloat4ToU32(ImVec4(color.r, color.g, color.b, 1.0f));
-            draw_list->AddRectFilled(p_min, p_max, col);
         }
     }
-    
-    // Move cursor forward
-    ImGui::Dummy(ImVec2(static_cast<float>(displayWidth), static_cast<float>(displayHeight)));
 }

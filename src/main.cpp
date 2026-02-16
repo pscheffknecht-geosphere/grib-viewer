@@ -55,6 +55,14 @@ int main(int argc, char** argv) {
     int previousMessage = -1;
     int messageCount = 0;
 
+    GLuint fieldTexture;
+    bool needNewTexture = true;
+    int displayWidth = 0;
+    int displayHeight = 0;
+    std::vector<Color> imgData;
+    ImVec2 yScanDirectionA = ImVec2(0, 0);
+    ImVec2 yScanDirectionB = ImVec2(1, 1);
+
     // Load file from command line if provided
     if (argc > 1) {
         strcpy(filename, argv[1]);
@@ -99,6 +107,15 @@ int main(int argc, char** argv) {
                 currentMessage = 0;
                 if (messageCount > 0) {
                     reader.readField(currentMessage, currentField);
+                    if (currentField.yScansNegatively) {
+                        yScanDirectionA = ImVec2(0, 1);
+                        yScanDirectionB = ImVec2(1, 0);
+                    }
+                    else {
+                        yScanDirectionA = ImVec2(0, 0);
+                        yScanDirectionB = ImVec2(1, 1);
+
+                    }
                 }
             } else {
                 fileLoaded = false;
@@ -107,7 +124,7 @@ int main(int argc, char** argv) {
         }
 
         ImGui::Separator();
-
+        static bool updateImg = false;
         if (fileLoaded && messageCount > 0) {
 
             // Message selection
@@ -116,7 +133,7 @@ int main(int argc, char** argv) {
             if (currentMessage != previousMessage) {
                 reader.readField(currentMessage, currentField);
                 previousMessage = currentMessage;
-                
+                updateImg = true;
             }
 
             ImGui::Separator();
@@ -133,17 +150,23 @@ int main(int argc, char** argv) {
 
             // Visualization
             ImGui::Text("Visualization:");
+            static int previousZoomFactor = 1;
             ImGui::SliderInt("Display Zoom Factor", &settings.displayZoomFactor, 1, 10);
-            static int current = 0;
-            if (ImGui::BeginCombo("Gradient", mpl_gradient_names[current].c_str()))
+            if (settings.displayZoomFactor != previousZoomFactor) {
+                needNewTexture = true;
+                previousZoomFactor = settings.displayZoomFactor;
+            }
+            static int currentGradient = 0;
+            static int previousGradient = 0;
+            if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))
             {
                 for (int i = 0; i < mpl_gradient_names.size(); ++i)
                 {
-                    bool is_selected = (current == i);
+                    bool is_selected = (currentGradient == i);
 
                     if (ImGui::Selectable(mpl_gradient_names[i].c_str(), is_selected))
                     {
-                        current = i;
+                        currentGradient = i;
                         settings.gradient = mpl_gradients[i];
                     }
 
@@ -152,14 +175,28 @@ int main(int argc, char** argv) {
                 }
 
                 ImGui::EndCombo();
-}
+                if (currentGradient != previousGradient) {
+                    needNewTexture = true;
+                    previousGradient = currentGradient;
+                }
+            }
             ImGui::BeginChild("Visualization", ImVec2(0, 0), true);
             
             
-            int displayWidth = currentField.width * settings.displayZoomFactor;
-            int displayHeight = displayWidth * currentField.height / currentField.width; 
-            renderer.renderField(currentField, displayWidth, displayHeight, settings);
-            
+            if (needNewTexture) {
+                displayWidth = currentField.width * settings.displayZoomFactor;
+                displayHeight = displayWidth * currentField.height / currentField.width; 
+                imgData.resize(displayHeight * displayWidth);
+                fieldTexture = renderer.createTexture(displayWidth, displayHeight);
+                needNewTexture = false;
+            }
+
+            if (updateImg) {
+                renderer.renderField(currentField, displayWidth, displayHeight, settings, imgData);
+                renderer.updateTexture(fieldTexture, displayWidth, displayHeight, imgData);
+                updateImg = false;
+            }
+            ImGui::Image((ImTextureID)(intptr_t)fieldTexture, ImVec2(displayWidth, displayHeight)); //, ImVec2(0,1), ImVec2(0, 1)); //yScanDirection); // uv1);
             ImGui::EndChild();
         } else {
             ImGui::Text("No GRIB file loaded.");
