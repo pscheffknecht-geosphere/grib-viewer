@@ -67,8 +67,8 @@ Color valueToColor(double value, double min_val, double max_val, const Gradient&
     GribViewerSettings& settings) {
     // Normalize value to 0-1
     double normalized = (value - min_val) / (max_val - min_val);
-    if (settings.sqrtScale) normalized = sqrt(normalized);
     normalized = std::clamp(normalized, 0.0, 1.0);
+    if (settings.sqrtScale) normalized = sqrt(normalized);
     
     // Color c = value >= -999999999. ? Color(.7f, 0.f, 0.f) : gradient.get_color(static_cast<float>(normalized));
     Color c = gradient.get_color(static_cast<float>(normalized));
