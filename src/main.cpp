@@ -156,6 +156,9 @@ int main(int argc, char** argv) {
                 needNewTexture = true;
                 previousZoomFactor = settings.displayZoomFactor;
             }
+            ImGui::Checkbox("Use custom min and max", &settings.useCustomMinMax);
+            ImGui::InputFloat("Minimum", &settings.minVal);
+            ImGui::InputFloat("Maximum", &settings.maxVal);
             static int currentGradient = 0;
             static int previousGradient = 0;
             if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))
