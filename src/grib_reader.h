@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <imgui.h>
 
 #include <string>
 #include <vector>
@@ -24,6 +25,7 @@ struct GribField {
     std::vector<double> values;
     double min_value;
     double max_value;
+    bool yScansNegatively = false;
     
     GribField() : width(0), height(0), min_value(0.0), max_value(0.0) {}
 };
@@ -42,6 +44,7 @@ public:
 
     bool readCode(codes_handle* h, const char* name, std::string& value);
     bool readCode(codes_handle* h, const char* name, long& value);
+    bool readCode(codes_handle* h, const char* name, bool& value);
     void readValue(size_t& len, codes_handle* h, char buffer[256], GribField& field);
 
     const std::string& getLastError() const { return lastError; }

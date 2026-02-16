@@ -69,6 +69,16 @@ bool GribReader::readCode(codes_handle* h, const char* name, long& value) {
     else return false;
 }
 
+bool GribReader::readCode(codes_handle* h, const char* name, bool& value) {
+    long val = false;
+    if (codes_is_defined(h, name) == true) {
+        CODES_CHECK(codes_get_long(h, name, &val), 0);
+        value = static_cast<bool>(val);
+        return true;
+    }
+    else return false;
+}
+
 bool GribReader::readField(int messageIndex, GribField& field) {
     if (!fileHandle) {
         lastError = "No file open";
@@ -126,6 +136,8 @@ bool GribReader::readField(int messageIndex, GribField& field) {
         field.parameterNumber = -1;
     if (! readCode(h, "indicatorOfParameter", field.indicatorOfParameter))
         field.indicatorOfParameter = 9999;
+    if (! readCode(h, "yScansNegatively", field.yScansNegatively))
+        field.yScansNegatively = false;
     
     // Get values
     size_t values_len = 0;
