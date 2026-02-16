@@ -10,3 +10,6 @@ struct GribViewerSettings {
     float maxVal = 1.;
     bool useCustomMinMax = false;
 };
+
+bool operator==(GribViewerSettings& lhs, GribViewerSettings& rhs);
+bool operator!=(GribViewerSettings& lhs, GribViewerSettings& rhs);

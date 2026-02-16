@@ -67,6 +67,7 @@ set(HEADERS
     src/mpl_gradients.h
     src/gradient.h
     src/settings.h
+    src/settings.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})

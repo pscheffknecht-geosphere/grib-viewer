@@ -78,6 +78,8 @@ int main(int argc, char** argv) {
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         static GribViewerSettings settings;
+        static GribViewerSettings settings_old;
+
         glfwPollEvents();
 
         // Start ImGui frame
@@ -185,6 +187,10 @@ int main(int argc, char** argv) {
             }
             ImGui::BeginChild("Visualization", ImVec2(0, 0), true);
             
+            if (settings != settings_old) {
+                needNewTexture = true;
+                settings_old = settings;
+            }
             
             if (needNewTexture) {
                 displayWidth = currentField.width * settings.displayZoomFactor;
