@@ -63,9 +63,11 @@ void Renderer::updateTexture(GLuint texture,
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Color valueToColor(double value, double min_val, double max_val, const Gradient& gradient) {
+Color valueToColor(double value, double min_val, double max_val, const Gradient& gradient,
+    GribViewerSettings& settings) {
     // Normalize value to 0-1
     double normalized = (value - min_val) / (max_val - min_val);
+    if (settings.sqrtScale) normalized = sqrt(normalized);
     normalized = std::clamp(normalized, 0.0, 1.0);
     
     // Color c = value >= -999999999. ? Color(.7f, 0.f, 0.f) : gradient.get_color(static_cast<float>(normalized));
@@ -95,7 +97,8 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
             size_t idxImg = y * displayWidth + x;
 
             double value = field.values[idxField];
-            imgData[idxImg] = valueToColor(value, colorMinValue, colorMaxValue, settings.gradient);
+            imgData[idxImg] = valueToColor(value, colorMinValue, colorMaxValue, settings.gradient,
+                settings);
             
         }
     }

@@ -8,7 +8,9 @@ struct GribViewerSettings {
     Gradient gradient = mpl_gradients[0];
     float minVal = 0.;
     float maxVal = 1.;
+    bool sqrtScale = false;
     bool useCustomMinMax = false;
+
 };
 
 bool operator==(GribViewerSettings& lhs, GribViewerSettings& rhs);

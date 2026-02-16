@@ -161,6 +161,8 @@ int main(int argc, char** argv) {
             ImGui::Checkbox("Use custom min and max", &settings.useCustomMinMax);
             ImGui::InputFloat("Minimum", &settings.minVal);
             ImGui::InputFloat("Maximum", &settings.maxVal);
+            ImGui::Checkbox("Use sqrt scaling", &settings.sqrtScale);
+            
             static int currentGradient = 0;
             static int previousGradient = 0;
             if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))

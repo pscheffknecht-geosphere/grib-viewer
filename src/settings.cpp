@@ -5,6 +5,7 @@ bool operator==(GribViewerSettings& lhs, GribViewerSettings& rhs) {
         lhs.displayZoomFactor == rhs.displayZoomFactor &&
         lhs.minVal == rhs.minVal &&
         lhs.maxVal == rhs.maxVal &&
+        lhs.sqrtScale == rhs.sqrtScale &&
         lhs.useCustomMinMax == rhs.useCustomMinMax
     );
 }
