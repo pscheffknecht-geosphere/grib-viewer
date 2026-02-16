@@ -20,6 +20,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         -Wpedantic
         -Wno-unused-parameter
         -march=native
+        -fopenmp
     )
     
     # Debug flags
@@ -88,6 +89,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${ECCODES_LIB}
     m
     pthread
+    gomp
 )
 
 # Copy shaders or resources if needed

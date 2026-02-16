@@ -82,6 +82,7 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
     }
     
     // Fill each pixel
+    # pragma omp parallel for
     for (size_t y = 0; y < displayHeight; ++y) {
         for (size_t x = 0; x < displayWidth; ++x) {
             
