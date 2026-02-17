@@ -157,14 +157,14 @@ int main(int argc, char** argv) {
             ImGui::Separator();
 
             // Field information
-            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %d) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
+            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %ld) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
                         currentField.indicatorOfParameter, currentField.indicatorOfTypeOfLevel.c_str());
-            ImGui::Text("    parameterNumber = %d, category = %d, discipline = %d", currentField.parameterNumber, 
+            ImGui::Text("    parameterNumber = %ld, category = %ld, discipline = %ld", currentField.parameterNumber, 
                 currentField.parameterCategory, currentField.discipline);
-            ImGui::Text("Level: %d", currentField.level);
+            ImGui::Text("Level: %ld", currentField.level);
             ImGui::Text("    Type of level: %s (typeOfFirstFixedSurface: %s)", currentField.typeOfLevel.c_str(), currentField.typeOfFirstFixedSurface.c_str());
             ImGui::Text("Units: %s", currentField.units.c_str());
-            ImGui::Text("Dimensions: %d x %d", currentField.width, currentField.height);
+            ImGui::Text("Dimensions: %ld x %ld", currentField.width, currentField.height);
             ImGui::Text("Value range: %.6f to %.6f", currentField.min_value, currentField.max_value);
 
             ImGui::Separator();
@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
             static int previousGradient = 0;
             if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))
             {
-                for (int i = 0; i < mpl_gradient_names.size(); ++i)
+                for (size_t i = 0; i < mpl_gradient_names.size(); ++i)
                 {
                     bool is_selected = (currentGradient == i);
 

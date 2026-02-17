@@ -12,17 +12,6 @@ struct GribViewerSettings {
     uint32_t colorCount = 25;
     bool sqrtScale = false;
     bool useCustomMinMax = false;
-    GribViewerSettings operator=(const GribViewerSettings& other) {
-        displayZoomFactor = other.displayZoomFactor;
-        gradient = other.gradient;
-        minVal = other.minVal;
-        maxVal = other.maxVal;
-        discreteColors = other.discreteColors;
-        colorCount = other.colorCount;
-        sqrtScale = other.sqrtScale;
-        useCustomMinMax = other.useCustomMinMax;
-        return *this;
-    }
 };
 
 bool operator==(const GribViewerSettings& lhs, const GribViewerSettings& rhs);

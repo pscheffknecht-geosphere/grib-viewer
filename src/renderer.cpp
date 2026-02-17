@@ -92,13 +92,13 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
 
     // Fill each pixel
     # pragma omp parallel for
-    for (size_t y = 0; y < displayHeight; ++y) {
-        for (size_t x = 0; x < displayWidth; ++x) {
+    for (int y = 0; y < displayHeight; ++y) {
+        for (int x = 0; x < displayWidth; ++x) {
             
             int fieldPosX = x * field.width / displayWidth;
             int fieldPosY = y * field.height / displayHeight;
-            size_t idxField = field.width * fieldPosY + fieldPosX;
-            size_t idxImg = y * displayWidth + x;
+            int idxField = field.width * fieldPosY + fieldPosX;
+            int idxImg = y * displayWidth + x;
 
             double value = field.values[idxField];
             imgData[idxImg] = valueToColor(value, colorMinValue, colorMaxValue, settings.gradient,
@@ -111,8 +111,8 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
 void Renderer::updateCbar(GLuint texture, const int width, const int height, std::vector<Color>& data,
     GribViewerSettings& settings) {
     
-    for (uint y = 0; y < height; y++) {
-        for (uint x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             uint idx = y * width + x;
             float cidx = float(x) / float(width - 1);
             cidx = std::clamp(cidx, 0.f, 1.f);
