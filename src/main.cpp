@@ -162,6 +162,7 @@ int main(int argc, char** argv) {
             ImGui::Text("    parameterNumber = %d, category = %d, discipline = %d", currentField.parameterNumber, 
                 currentField.parameterCategory, currentField.discipline);
             ImGui::Text("Level: %d", currentField.level);
+            ImGui::Text("    Type of level: %s (typeOfFirstFixedSurface: %s)", currentField.typeOfLevel.c_str(), currentField.typeOfFirstFixedSurface.c_str());
             ImGui::Text("Units: %s", currentField.units.c_str());
             ImGui::Text("Dimensions: %d x %d", currentField.width, currentField.height);
             ImGui::Text("Value range: %.6f to %.6f", currentField.min_value, currentField.max_value);

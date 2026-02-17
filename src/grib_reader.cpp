@@ -122,6 +122,10 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     len = 256;
     if (! readCode(h, "indicatorOfTypeOfLevel", field.indicatorOfTypeOfLevel))
         field.indicatorOfTypeOfLevel = "VOID";
+    if (! readCode(h, "typeOfLevel", field.typeOfLevel))
+        field.typeOfLevel = "VOID";
+    if (! readCode(h, "typeOfFirstFixedSurface", field.typeOfFirstFixedSurface))
+        field.typeOfFirstFixedSurface = "VOID";
 
     // Get dimensions
     if (! readCode(h, "Ni", field.width))

@@ -15,6 +15,8 @@ struct GribField {
     std::string shortName;
     std::string units;
     std::string indicatorOfTypeOfLevel;
+    std::string typeOfLevel;
+    std::string typeOfFirstFixedSurface;
     long level;
     long width;
     long height;
