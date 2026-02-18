@@ -159,3 +159,59 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     codes_handle_delete(h);
     return true;
 }
+
+bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info) {
+    if (!fileHandle) {
+        lastError = "No file open";
+        return false;
+    }
+    
+    FILE* f = static_cast<FILE*>(fileHandle);
+    fseek(f, 0, SEEK_SET);
+    
+    int err = 0;
+    codes_handle* h = nullptr;
+    
+    // Skip to the requested message
+    for (int i = 0; i <= messageIndex; i++) {
+        if (h) codes_handle_delete(h);
+        h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
+        if (!h) {
+            lastError = "Cannot read message " + std::to_string(messageIndex);
+            return false;
+        }
+    }
+    
+    // Read metadata (same as in readField but without values)
+    if (! readCode(h, "name", info.name))
+        info.name = "~";
+    if (! readCode(h, "shortName", info.shortName))
+        info.shortName = "~";
+    if (! readCode(h, "units", info.units))
+        info.units = "~";
+    if (! readCode(h, "indicatorOfTypeOfLevel", info.indicatorOfTypeOfLevel))
+        info.indicatorOfTypeOfLevel = "~";
+    if (! readCode(h, "typeOfLevel", info.typeOfLevel))
+        info.typeOfLevel = "~";
+    if (! readCode(h, "typeOfFirstFixedSurface", info.typeOfFirstFixedSurface))
+        info.typeOfFirstFixedSurface = "~";
+
+    // Get dimensions
+    if (! readCode(h, "Ni", info.width))
+        info.discipline = -1;
+    if (! readCode(h, "Nj", info.height))
+        info.discipline = -1;
+    if (! readCode(h, "level", info.level))
+        info.level = -1;
+    if (! readCode(h, "discipline", info.discipline))
+        info.discipline = -1;
+    if (! readCode(h, "parameterNumber", info.parameterNumber))
+        info.parameterNumber = -1;
+    if (! readCode(h, "parameterCategory", info.parameterCategory))
+        info.parameterCategory = -1;
+    if (! readCode(h, "indicatorOfParameter", info.indicatorOfParameter))
+        info.indicatorOfParameter = 9999;
+
+    codes_handle_delete(h);
+    return true;
+}

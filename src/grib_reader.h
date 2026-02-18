@@ -32,6 +32,23 @@ struct GribField {
     GribField() : width(0), height(0), min_value(0.0), max_value(0.0) {}
 };
 
+struct GribMessageInfo
+{
+    std::string name;
+    std::string shortName;
+    std::string units;
+    std::string indicatorOfTypeOfLevel;
+    std::string typeOfLevel;
+    std::string typeOfFirstFixedSurface;
+    long level;
+    long width;
+    long height;
+    long indicatorOfParameter;
+    long parameterNumber;
+    long discipline;
+    long parameterCategory;
+};
+
 class GribReader {
 public:
     GribReader();
@@ -43,6 +60,7 @@ public:
     int getMessageCount() const;
     bool get_value(const codes_handle* h, const char* value_name, const int* value, const int& len);
     bool readField(int messageIndex, GribField& field);
+    bool readFieldMetadata(const int messageIndex, GribMessageInfo& field);
 
     bool readCode(codes_handle* h, const char* name, std::string& value);
     bool readCode(codes_handle* h, const char* name, long& value);
