@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "settings.h"
 #include "mpl_gradients.h"
+#include "messagesWindow.h"
 
 static void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -60,6 +61,7 @@ int main(int argc, char** argv) {
     colors[ImGuiCol_Tab]             = ImVec4(0.05f, 0.22f, 0.26f, 1.0f);
     colors[ImGuiCol_TabHovered]      = ImVec4(0.10f, 0.35f, 0.40f, 1.0f);
     colors[ImGuiCol_TabActive]       = ImVec4(0.08f, 0.40f, 0.50f, 1.0f);
+    colors[ImGuiCol_TabUnfocused]    = ImVec4(0.05f, 0.22f, 0.26f, 0.7f);
 
     // --- Lime accent (interaction only) ---
     colors[ImGuiCol_Button]          = ImVec4(0.60f, 0.65f, 0.20f, 1.0f);
@@ -81,6 +83,7 @@ int main(int argc, char** argv) {
     GribReader reader;
     Renderer renderer;
     GribField currentField;
+    std::vector<GribMessageInfo> messageList;
     bool fileLoaded = false;
     char filename[512] = "";
     int currentMessage = 0;
@@ -104,6 +107,9 @@ int main(int argc, char** argv) {
     std::vector<Color> cbarData;
     cbarData.resize(cbarWidth * cbarHeight);
 
+    // sub windows
+    bool showMessageListWindow = false;
+
     // Load file from command line if provided
     if (argc > 1) {
         strcpy(filename, argv[1]);
@@ -120,6 +126,14 @@ int main(int argc, char** argv) {
                     yScanDirectionA = ImVec2(0, 0);
                     yScanDirectionB = ImVec2(1, 1);
                 }
+            }
+            messageList.clear();
+            for (int i = 0; i < messageCount; ++i)
+            {
+                std::cout << "Getting info for message " << i << std::endl;
+                GribMessageInfo info;
+                reader.readFieldMetadata(i, info);  // lightweight version
+                messageList.push_back(info);
             }
         }
     }
@@ -190,6 +204,13 @@ int main(int argc, char** argv) {
                         yScanDirectionA = ImVec2(0, 0);
                         yScanDirectionB = ImVec2(1, 1);
                     }
+                    messageList.clear();
+                    for (int i = 0; i < messageCount; ++i)
+                    {
+                        GribMessageInfo info;
+                        reader.readFieldMetadata(i, info);  // lightweight version
+                        messageList.push_back(info);
+                    }
                 }
             } else {
                 fileLoaded = false;
@@ -200,7 +221,12 @@ int main(int argc, char** argv) {
         ImGui::Separator();
         static bool updateImg = false;
         if (fileLoaded && messageCount > 0) {
-            
+            if (ImGui::Button("Show Messages Window")) {
+                showMessageListWindow = !showMessageListWindow;
+            }
+            if (showMessageListWindow) {
+                gribMessageListWindow(&showMessageListWindow, messageList, currentMessage);
+            }
             // Message selection
             ImGui::Text("Message: %d / %d", currentMessage + 1, messageCount);
             ImGui::SliderInt("##message", &currentMessage, 0, messageCount - 1);
@@ -226,15 +252,18 @@ int main(int argc, char** argv) {
             ImGui::Separator();
 
             // Visualization
-            ImGui::Text("Visualization:");
-            ImGui::SliderInt("Display Zoom Factor", &settings.displayZoomFactor, 1, 10);
-            ImGui::Checkbox("Use custom min and max", &settings.useCustomMinMax);
-            ImGui::InputFloat("Minimum", &settings.minVal, 0.f, 0.f, "%.8f");
-            ImGui::InputFloat("Maximum", &settings.maxVal, 0.f, 0.f, "%.8f");
-            ImGui::Checkbox("Use sqrt scaling", &settings.sqrtScale);
-            ImGui::Checkbox("Use discrete colors", &settings.discreteColors);
-            ImGui::InputInt("Color count (for discrete)", (int*)&settings.colorCount);
-
+            ImGui::Begin("Visualization Settings");
+            {
+                ImGui::Text("Visualization:");
+                ImGui::SliderInt("Display Zoom Factor", &settings.displayZoomFactor, 1, 10);
+                ImGui::Checkbox("Use custom min and max", &settings.useCustomMinMax);
+                ImGui::InputFloat("Minimum", &settings.minVal, 0.f, 0.f, "%.8f");
+                ImGui::InputFloat("Maximum", &settings.maxVal, 0.f, 0.f, "%.8f");
+                ImGui::Checkbox("Use sqrt scaling", &settings.sqrtScale);
+                ImGui::Checkbox("Use discrete colors", &settings.discreteColors);
+                ImGui::InputInt("Color count (for discrete)", (int*)&settings.colorCount);
+            }
+            ImGui::End();
             static int currentGradient = 0;
             static int previousGradient = 0;
             if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))

@@ -60,6 +60,7 @@ set(SOURCES
     src/renderer.cpp
     src/mpl_gradients.cpp
 	src/settings.cpp
+    src/messagesWindow.cpp
 )
 
 set(HEADERS
