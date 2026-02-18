@@ -37,10 +37,42 @@ int main(int argc, char** argv) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // <-- ADD THIS
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // optional
 
     // Setup style
     ImGui::StyleColorsDark();
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4* colors = style.Colors;
 
+    // --- Backgrounds (Midnight-based layers) ---
+    colors[ImGuiCol_WindowBg]        = ImVec4(0.02f, 0.18f, 0.22f, 1.0f);
+    colors[ImGuiCol_DockingEmptyBg]  = ImVec4(0.015f, 0.15f, 0.18f, 1.0f);
+    colors[ImGuiCol_ChildBg]         = ImVec4(0.03f, 0.22f, 0.27f, 1.0f);
+    colors[ImGuiCol_PopupBg]         = ImVec4(0.03f, 0.22f, 0.27f, 1.0f);
+
+    // --- Title bars (desaturated Midnight, not accent color) ---
+    colors[ImGuiCol_TitleBg]         = ImVec4(0.04f, 0.25f, 0.30f, 1.0f);
+    colors[ImGuiCol_TitleBgActive]   = ImVec4(0.06f, 0.32f, 0.38f, 1.0f);
+    colors[ImGuiCol_TitleBgCollapsed]= ImVec4(0.04f, 0.25f, 0.30f, 0.7f);
+
+    // --- Tabs ---
+    colors[ImGuiCol_Tab]             = ImVec4(0.05f, 0.22f, 0.26f, 1.0f);
+    colors[ImGuiCol_TabHovered]      = ImVec4(0.10f, 0.35f, 0.40f, 1.0f);
+    colors[ImGuiCol_TabActive]       = ImVec4(0.08f, 0.40f, 0.50f, 1.0f);
+
+    // --- Lime accent (interaction only) ---
+    colors[ImGuiCol_Button]          = ImVec4(0.60f, 0.65f, 0.20f, 1.0f);
+    colors[ImGuiCol_ButtonHovered]   = ImVec4(0.75f, 0.81f, 0.25f, 1.0f);
+    colors[ImGuiCol_ButtonActive]    = ImVec4(0.50f, 0.55f, 0.18f, 1.0f);
+
+    colors[ImGuiCol_SliderGrab]      = ImVec4(0.75f, 0.81f, 0.25f, 1.0f);
+    colors[ImGuiCol_SliderGrabActive]= ImVec4(0.85f, 0.90f, 0.30f, 1.0f);
+    colors[ImGuiCol_CheckMark]       = ImVec4(0.75f, 0.81f, 0.25f, 1.0f);
+
+    // --- Text ---
+    colors[ImGuiCol_Text]            = ImVec4(0.95f, 0.95f, 0.95f, 1.0f);
+    colors[ImGuiCol_TextDisabled]    = ImVec4(0.65f, 0.75f, 0.75f, 1.0f);
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -98,19 +130,43 @@ int main(int argc, char** argv) {
         static GribViewerSettings settings_old;
 
         glfwPollEvents();
-
+        // ImGuiID dockspace_id = ImGui::GetID("GRIB Viewer");
         // Start ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuiWindowFlags window_flags =
+            ImGuiWindowFlags_NoDocking |
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoNavFocus;
 
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+        ImGui::Begin("DockSpaceHost", nullptr, window_flags);
+
+        ImGui::PopStyleVar(2);
+
+        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+
+        ImGui::End();
         // Main window
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-        ImGui::Begin("GRIB Viewer", nullptr, 
+        // ImGui::SetNextWindowPos(ImVec2(0, 0));
+        // ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        ImGui::Begin("GRIB Viewer"); /*, nullptr, 
                      ImGuiWindowFlags_NoTitleBar | 
                      ImGuiWindowFlags_NoResize | 
-                     ImGuiWindowFlags_NoMove);
+                     ImGuiWindowFlags_NoMove); */
 
         // File selection
         ImGui::Text("GRIB File:");
@@ -144,7 +200,7 @@ int main(int argc, char** argv) {
         ImGui::Separator();
         static bool updateImg = false;
         if (fileLoaded && messageCount > 0) {
-
+            
             // Message selection
             ImGui::Text("Message: %d / %d", currentMessage + 1, messageCount);
             ImGui::SliderInt("##message", &currentMessage, 0, messageCount - 1);
@@ -259,7 +315,13 @@ int main(int argc, char** argv) {
         glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
         glfwSwapBuffers(window);
     }
 
