@@ -58,6 +58,7 @@ public:
     void close();
     
     int getMessageCount() const;
+    void getMessageOffsets();
     bool get_value(const codes_handle* h, const char* value_name, const int* value, const int& len);
     bool readField(int messageIndex, GribField& field);
     bool readFieldMetadata(const int messageIndex, GribMessageInfo& field);
@@ -72,5 +73,6 @@ public:
 private:
     std::string filename;
     std::string lastError;
+    std::vector<long> messageOffsets;
     void* fileHandle;
 };

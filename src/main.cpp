@@ -111,12 +111,14 @@ int main(int argc, char** argv) {
     bool showMessageListWindow = false;
 
     // Load file from command line if provided
+    std::vector<long> messageOffsets;
     if (argc > 1) {
         strcpy(filename, argv[1]);
         if (reader.openFile(filename)) {
             fileLoaded = true;
             messageCount = reader.getMessageCount();
             if (messageCount > 0) {
+                reader.getMessageOffsets();
                 reader.readField(0, currentField);
                 if (currentField.jScansPositively == 1) {
                     yScanDirectionA = ImVec2(0, 1);

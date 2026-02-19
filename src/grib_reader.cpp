@@ -49,6 +49,22 @@ int GribReader::getMessageCount() const {
     return count;
 }
 
+void GribReader::getMessageOffsets() {
+    FILE* f = static_cast<FILE*>(fileHandle);
+    fseek(f, 0, SEEK_SET);
+    int err = 0;
+    messageOffsets.clear();
+    
+    while (true)
+    {
+        long offset = ftell(f);
+        codes_handle* h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
+        if (!h) break;
+        messageOffsets.push_back(offset);
+        codes_handle_delete(h);
+    }    
+}
+
 bool GribReader::readCode(codes_handle* h, const char* name, std::string& value) {
     if (codes_is_defined(h, name) == true) {
         size_t len = 256;
@@ -86,20 +102,12 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     }
     
     FILE* f = static_cast<FILE*>(fileHandle);
-    fseek(f, 0, SEEK_SET);
-    
+
+    fseek(f, messageOffsets[messageIndex], SEEK_SET);
+
     int err = 0;
-    codes_handle* h = nullptr;
-    
-    // Skip to the requested message
-    for (int i = 0; i <= messageIndex; i++) {
-        if (h) codes_handle_delete(h);
-        h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
-        if (!h) {
-            lastError = "Cannot read message " + std::to_string(messageIndex);
-            return false;
-        }
-    }
+    codes_handle* h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
+    if (!h) return false;
     
     // Read metadata
     size_t len = 256;
@@ -167,20 +175,12 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
     }
     
     FILE* f = static_cast<FILE*>(fileHandle);
-    fseek(f, 0, SEEK_SET);
-    
+
+    fseek(f, messageOffsets[messageIndex], SEEK_SET);
+
     int err = 0;
-    codes_handle* h = nullptr;
-    
-    // Skip to the requested message
-    for (int i = 0; i <= messageIndex; i++) {
-        if (h) codes_handle_delete(h);
-        h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
-        if (!h) {
-            lastError = "Cannot read message " + std::to_string(messageIndex);
-            return false;
-        }
-    }
+    codes_handle* h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
+    if (!h) return false;
     
     // Read metadata (same as in readField but without values)
     if (! readCode(h, "name", info.name))
