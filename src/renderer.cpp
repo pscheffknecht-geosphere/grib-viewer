@@ -69,8 +69,7 @@ Color valueToColor(double value, double min_val, double max_val, const Gradient&
     double normalized = (value - min_val) / (max_val - min_val);
     normalized = std::clamp(normalized, 0.0, 1.0);
     if (settings.discreteColors) {
-        double step = 1.0 / settings.colorCount;
-        normalized = std::floor(normalized / step) * step + step / 2.0;
+        normalized = std::floor(normalized * settings.colorCount) / (settings.colorCount - 1.);
     }
     if (settings.sqrtScale) normalized = sqrt(normalized);
     
@@ -117,8 +116,7 @@ void Renderer::updateCbar(GLuint texture, const int width, const int height, std
             float cidx = float(x) / float(width - 1);
             cidx = std::clamp(cidx, 0.f, 1.f);
             if (settings.discreteColors) {
-                float step = 1.f / settings.colorCount;
-                cidx = std::floor(cidx / step) * step + step / 2.f;
+                cidx = std::floor(cidx * settings.colorCount) / (settings.colorCount - 1.);
             }
             if (settings.sqrtScale) cidx = sqrt(cidx);
             data[idx] = settings.gradient.get_color(cidx);
