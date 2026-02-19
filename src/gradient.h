@@ -8,6 +8,8 @@ struct Color {
     Color() : r(0), g(0), b(0) {}
     Color(float r, float g, float b) : r(r), g(g), b(b) {}
     Color(float s) : r(s), g(s), b(s) {}
+    Color operator+(const Color& rhs) const { return Color(r + rhs.r, g + rhs.g, b+ rhs.b); }
+    Color operator*(const float s) const {return Color(r * s, g * s, b * s); }
     ~Color() {}
 };
 
@@ -46,11 +48,7 @@ class Gradient {
         for (size_t i = 0; i < positions.size() - 1; ++i) {
             if (t >= positions[i] && t <= positions[i + 1]) {
                 float local_t = (t - positions[i]) / (positions[i + 1] - positions[i]);
-                return linear2srgb(Color(
-                    colors[i].r + local_t * (colors[i + 1].r - colors[i].r),
-                    colors[i].g + local_t * (colors[i + 1].g - colors[i].g),
-                    colors[i].b + local_t * (colors[i + 1].b - colors[i].b)
-                ));
+                return linear2srgb(srgb2linear(colors[i + 1]) * local_t + srgb2linear(colors[i]) * (1.f - local_t));
             }
         }
         return Color(1.f, 0.f, 1.f); // Should never reach here
