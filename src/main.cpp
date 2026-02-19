@@ -114,29 +114,8 @@ int main(int argc, char** argv) {
     std::vector<long> messageOffsets;
     if (argc > 1) {
         strcpy(filename, argv[1]);
-        if (reader.openFile(filename)) {
-            fileLoaded = true;
-            messageCount = reader.getMessageCount();
-            if (messageCount > 0) {
-                reader.getMessageOffsets();
-                reader.readField(0, currentField);
-                if (currentField.jScansPositively == 1) {
-                    yScanDirectionA = ImVec2(0, 1);
-                    yScanDirectionB = ImVec2(1, 0);
-                }
-                else {
-                    yScanDirectionA = ImVec2(0, 0);
-                    yScanDirectionB = ImVec2(1, 1);
-                }
-            }
-            messageList.clear();
-            for (int i = 0; i < messageCount; ++i)
-            {
-                GribMessageInfo info;
-                reader.readFieldMetadata(i, info);  // lightweight version
-                messageList.push_back(info);
-            }
-        }
+        reader.loadFile(filename, fileLoaded, messageCount, currentField, yScanDirectionA,
+                 yScanDirectionB, messageList);
     }
 
     // Main loop
@@ -191,32 +170,8 @@ int main(int argc, char** argv) {
         
         if (ImGui::Button("Load")) {
             reader.close();
-            if (reader.openFile(filename)) {
-                fileLoaded = true;
-                messageCount = reader.getMessageCount();
-                currentMessage = 0;
-                if (messageCount > 0) {
-                    reader.readField(currentMessage, currentField);
-                    if (currentField.jScansPositively == 1) {
-                        yScanDirectionA = ImVec2(0, 1);
-                        yScanDirectionB = ImVec2(1, 0);
-                    }
-                    else {
-                        yScanDirectionA = ImVec2(0, 0);
-                        yScanDirectionB = ImVec2(1, 1);
-                    }
-                    messageList.clear();
-                    for (int i = 0; i < messageCount; ++i)
-                    {
-                        GribMessageInfo info;
-                        reader.readFieldMetadata(i, info);  // lightweight version
-                        messageList.push_back(info);
-                    }
-                }
-            } else {
-                fileLoaded = false;
-                std::cerr << "Error: " << reader.getLastError() << std::endl;
-            }
+            reader.loadFile(filename, fileLoaded, messageCount, currentField, yScanDirectionA,
+                    yScanDirectionB, messageList);
         }
 
         ImGui::Separator();
