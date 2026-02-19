@@ -9,7 +9,7 @@ struct GribViewerSettings {
     float minVal = 0.;
     float maxVal = 1.;
     bool discreteColors = false;
-    uint32_t colorCount = 25;
+    size_t colorCount = 25;
     bool sqrtScale = false;
     bool useCustomMinMax = false;
 };
