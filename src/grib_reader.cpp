@@ -198,7 +198,7 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
     if (! readCode(h, "parameterCategory", info.parameterCategory))
         info.parameterCategory = -1;
     if (! readCode(h, "indicatorOfParameter", info.indicatorOfParameter))
-        info.indicatorOfParameter = 9999;
+        info.indicatorOfParameter = -1;
 
     codes_handle_delete(h);
     return true;
