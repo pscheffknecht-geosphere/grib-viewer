@@ -36,3 +36,5 @@ external/eccodes/lib/*.a
 # OS
 .DS_Store
 Thumbs.db
+imgui.ini
+compile_commands.json
