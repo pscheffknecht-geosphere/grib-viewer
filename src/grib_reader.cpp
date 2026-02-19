@@ -111,17 +111,17 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     
     // Read metadata
     if (! readCode(h, "name", field.name))
-        field.name = "VOID";
+        field.name = "~";
     if (! readCode(h, "shortName", field.shortName))
-        field.shortName = "VOID";
+        field.shortName = "~";
     if (! readCode(h, "units", field.units))
-        field.units = "void";
+        field.units = "~";
     if (! readCode(h, "indicatorOfTypeOfLevel", field.indicatorOfTypeOfLevel))
-        field.indicatorOfTypeOfLevel = "VOID";
+        field.indicatorOfTypeOfLevel = "~";
     if (! readCode(h, "typeOfLevel", field.typeOfLevel))
-        field.typeOfLevel = "VOID";
+        field.typeOfLevel = "~";
     if (! readCode(h, "typeOfFirstFixedSurface", field.typeOfFirstFixedSurface))
-        field.typeOfFirstFixedSurface = "VOID";
+        field.typeOfFirstFixedSurface = "~";
 
     // Get dimensions
     if (! readCode(h, "Ni", field.width))
@@ -137,7 +137,7 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     if (! readCode(h, "parameterCategory", field.parameterCategory))
         field.parameterCategory = -1;
     if (! readCode(h, "indicatorOfParameter", field.indicatorOfParameter))
-        field.indicatorOfParameter = 9999;
+        field.indicatorOfParameter = -1;
     if (! readCode(h, "jScansPositively", field.jScansPositively))
         field.jScansPositively = false;
     
