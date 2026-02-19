@@ -132,7 +132,6 @@ int main(int argc, char** argv) {
             messageList.clear();
             for (int i = 0; i < messageCount; ++i)
             {
-                std::cout << "Getting info for message " << i << std::endl;
                 GribMessageInfo info;
                 reader.readFieldMetadata(i, info);  // lightweight version
                 messageList.push_back(info);
