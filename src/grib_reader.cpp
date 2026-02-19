@@ -110,24 +110,12 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     if (!h) return false;
     
     // Read metadata
-    size_t len = 256;
-    char buffer[256];
-    
-    // CODES_CHECK(codes_get_string(h, "name", buffer, &len), 0);
     if (! readCode(h, "name", field.name))
         field.name = "VOID";
-    
-    len = 256;
-    // CODES_CHECK(codes_get_string(h, "shortName", buffer, &len), 0);
     if (! readCode(h, "shortName", field.shortName))
         field.shortName = "VOID";
-    
-    len = 256;
-    // CODES_CHECK(codes_get_string(h, "units", buffer, &len), 0);
     if (! readCode(h, "units", field.units))
         field.units = "void";
-
-    len = 256;
     if (! readCode(h, "indicatorOfTypeOfLevel", field.indicatorOfTypeOfLevel))
         field.indicatorOfTypeOfLevel = "VOID";
     if (! readCode(h, "typeOfLevel", field.typeOfLevel))
