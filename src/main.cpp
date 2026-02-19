@@ -82,13 +82,9 @@ int main(int argc, char** argv) {
     // Application state
     GribReader reader;
     Renderer renderer;
-    GribField currentField;
-    std::vector<GribMessageInfo> messageList;
-    bool fileLoaded = false;
     char filename[512] = "";
     int currentMessage = 0;
     int previousMessage = -1;
-    int messageCount = 0;
 
     // stuff for the main image
     GLuint fieldTexture;
@@ -114,8 +110,7 @@ int main(int argc, char** argv) {
     std::vector<long> messageOffsets;
     if (argc > 1) {
         strcpy(filename, argv[1]);
-        reader.loadFile(filename, fileLoaded, messageCount, currentField, yScanDirectionA,
-                 yScanDirectionB, messageList);
+        reader.loadFile(filename, yScanDirectionA, yScanDirectionB);
     }
 
     // Main loop
@@ -170,24 +165,23 @@ int main(int argc, char** argv) {
         
         if (ImGui::Button("Load")) {
             reader.close();
-            reader.loadFile(filename, fileLoaded, messageCount, currentField, yScanDirectionA,
-                    yScanDirectionB, messageList);
+            reader.loadFile(filename, yScanDirectionA, yScanDirectionB);
         }
 
         ImGui::Separator();
         static bool updateImg = false;
-        if (fileLoaded && messageCount > 0) {
+        if (reader.fileLoaded && reader.messageCount > 0) {
             if (ImGui::Button("Show Messages Window")) {
                 showMessageListWindow = !showMessageListWindow;
             }
             if (showMessageListWindow) {
-                gribMessageListWindow(&showMessageListWindow, messageList, currentMessage);
+                gribMessageListWindow(&showMessageListWindow, reader.messageList, currentMessage);
             }
             // Message selection
-            ImGui::Text("Message: %d / %d", currentMessage + 1, messageCount);
-            ImGui::SliderInt("##message", &currentMessage, 0, messageCount - 1);
+            ImGui::Text("Message: %d / %d", currentMessage + 1, reader.messageCount);
+            ImGui::SliderInt("##message", &currentMessage, 0, reader.messageCount - 1);
             if (currentMessage != previousMessage) {
-                reader.readField(currentMessage, currentField);
+                reader.readField(currentMessage, reader.currentField);
                 previousMessage = currentMessage;
                 updateImg = true;
             }
@@ -195,15 +189,15 @@ int main(int argc, char** argv) {
             ImGui::Separator();
 
             // Field information
-            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %ld) on typeOfLevel %s", currentField.name.c_str(), currentField.shortName.c_str(),
-                        currentField.indicatorOfParameter, currentField.indicatorOfTypeOfLevel.c_str());
-            ImGui::Text("    parameterNumber = %ld, category = %ld, discipline = %ld", currentField.parameterNumber, 
-                currentField.parameterCategory, currentField.discipline);
-            ImGui::Text("Level: %ld", currentField.level);
-            ImGui::Text("    Type of level: %s (typeOfFirstFixedSurface: %s)", currentField.typeOfLevel.c_str(), currentField.typeOfFirstFixedSurface.c_str());
-            ImGui::Text("Units: %s", currentField.units.c_str());
-            ImGui::Text("Dimensions: %ld x %ld", currentField.width, currentField.height);
-            ImGui::Text("Value range: %.6f to %.6f", currentField.min_value, currentField.max_value);
+            ImGui::Text("Field: %s (%s) (indicatorOfParameter: %ld) on typeOfLevel %s", reader.currentField.name.c_str(), reader.currentField.shortName.c_str(),
+                        reader.currentField.indicatorOfParameter, reader.currentField.indicatorOfTypeOfLevel.c_str());
+            ImGui::Text("    parameterNumber = %ld, category = %ld, discipline = %ld", reader.currentField.parameterNumber, 
+                reader.currentField.parameterCategory, reader.currentField.discipline);
+            ImGui::Text("Level: %ld", reader.currentField.level);
+            ImGui::Text("    Type of level: %s (typeOfFirstFixedSurface: %s)", reader.currentField.typeOfLevel.c_str(), reader.currentField.typeOfFirstFixedSurface.c_str());
+            ImGui::Text("Units: %s", reader.currentField.units.c_str());
+            ImGui::Text("Dimensions: %ld x %ld", reader.currentField.width, reader.currentField.height);
+            ImGui::Text("Value range: %.6f to %.6f", reader.currentField.min_value, reader.currentField.max_value);
 
             ImGui::Separator();
 
@@ -258,8 +252,8 @@ int main(int argc, char** argv) {
             }
             
             if (needNewTexture) {
-                displayWidth = currentField.width * settings.displayZoomFactor;
-                displayHeight = currentField.height * settings.displayZoomFactor; 
+                displayWidth = reader.currentField.width * settings.displayZoomFactor;
+                displayHeight = reader.currentField.height * settings.displayZoomFactor; 
                 imgData.resize(displayHeight * displayWidth);
                 glDeleteTextures(1, &fieldTexture);
                 fieldTexture = 0;
@@ -269,7 +263,7 @@ int main(int argc, char** argv) {
             }
 
             if (updateImg) {
-                renderer.renderField(currentField, displayWidth, displayHeight, settings, imgData);
+                renderer.renderField(reader.currentField, displayWidth, displayHeight, settings, imgData);
                 renderer.updateTexture(fieldTexture, displayWidth, displayHeight, imgData);
                 updateImg = false;
             }

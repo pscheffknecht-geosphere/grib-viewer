@@ -51,13 +51,15 @@ struct GribMessageInfo
 
 class GribReader {
 public:
+    bool fileLoaded = false;
+    int messageCount = 0;
+    GribField currentField;
+    std::vector<GribMessageInfo> messageList;
     GribReader();
     ~GribReader();
     
     bool openFile(const std::string& filename);
-    void loadFile(char filename[512], bool& fileLoaded, int& messageCount,
-              GribField& currentField, ImVec2& yScanDirectionA, ImVec2& yScanDirectionB,
-              std::vector<GribMessageInfo>& messageList);
+    void loadFile(char filename[512], ImVec2& yScanDirectionA, ImVec2& yScanDirectionB);
     void close();
     
     int getMessageCount() const;

@@ -22,9 +22,7 @@ bool GribReader::openFile(const std::string& fname) {
     return true;
 }
 
-void GribReader::loadFile(char filename[512], bool& fileLoaded, int& messageCount,
-              GribField& currentField, ImVec2& yScanDirectionA, ImVec2& yScanDirectionB,
-              std::vector<GribMessageInfo>& messageList) {
+void GribReader::loadFile(char filename[512], ImVec2& yScanDirectionA, ImVec2& yScanDirectionB) {
     if (openFile(filename)) {
         fileLoaded = true;
         messageCount = getMessageCount();
