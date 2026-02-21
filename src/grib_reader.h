@@ -24,6 +24,7 @@ struct GribField {
     long parameterNumber;
     long discipline;
     long parameterCategory;
+    long perturbationNumber;
     std::vector<double> values;
     double min_value;
     double max_value;
@@ -47,6 +48,7 @@ struct GribMessageInfo
     long parameterNumber;
     long discipline;
     long parameterCategory;
+    long perturbationNumber;
 };
 
 class GribReader {

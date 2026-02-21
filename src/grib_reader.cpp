@@ -164,6 +164,8 @@ bool GribReader::readField(int messageIndex, GribField& field) {
         field.indicatorOfParameter = -1;
     if (! readCode(h, "jScansPositively", field.jScansPositively))
         field.jScansPositively = false;
+    if (! readCode(h, "perturbationNumber", field.perturbationNumber))
+        field.perturbationNumber = -1;
     
     // Get values
     size_t values_len = 0;
@@ -223,6 +225,8 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
         info.parameterCategory = -1;
     if (! readCode(h, "indicatorOfParameter", info.indicatorOfParameter))
         info.indicatorOfParameter = -1;
+    if (! readCode(h, "perturbationNumber", info.perturbationNumber))
+        info.perturbationNumber = -1;
 
     codes_handle_delete(h);
     return true;
