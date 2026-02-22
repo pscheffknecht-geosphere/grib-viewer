@@ -34,8 +34,8 @@ void gribMessageListWindow(
                 "[" + std::to_string(i + 1) + "] " + memberInfo +
                 meta.shortName + " | (" + meta.name + ") [" + meta.units + "] on " + 
                 meta.typeOfLevel + " = " + std::to_string(meta.level) + " " + numberInfo;
-            if (ImGui::Selectable(label.c_str(), currentMessage == i))
-                currentMessage = i;
+            if (ImGui::Selectable(label.c_str(), currentMessage == meta.index))
+                currentMessage = meta.index;
         }
     }
 

@@ -41,6 +41,7 @@ void GribReader::loadFile(char filename[512], ImVec2& yScanDirectionA, ImVec2& y
         for (int i = 0; i < messageCount; ++i) {
             GribMessageInfo info;
             readFieldMetadata(i, info);  // lightweight version
+            info.index = i;
             messageList.push_back(info);
         }
     }

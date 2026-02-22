@@ -111,7 +111,18 @@ int main(int argc, char** argv) {
     if (argc > 1) {
         strcpy(filename, argv[1]);
         reader.loadFile(filename, yScanDirectionA, yScanDirectionB);
-    }
+        std::sort(reader.messageList.begin(), reader.messageList.end(),
+            [](const auto& a, const auto& b)
+            {
+                if (a.perturbationNumber != b.perturbationNumber)
+                    return a.perturbationNumber < b.perturbationNumber;
+
+                if (a.shortName != b.shortName)
+                    return a.shortName < b.shortName;
+
+                return a.level < b.level;
+            });
+        }
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -200,7 +211,7 @@ int main(int argc, char** argv) {
             ImGui::Text("Value range: %.6f to %.6f", reader.currentField.min_value, reader.currentField.max_value);
 
             ImGui::Separator();
-
+            
             // Visualization
             ImGui::Begin("Visualization Settings");
             {
