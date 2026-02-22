@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
     cbarData.resize(cbarWidth * cbarHeight);
 
     // sub windows
-    bool showMessageListWindow = false;
+    bool showMessageListWindow = true;
 
     // Load file from command line if provided
     std::vector<long> messageOffsets;
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
             ImGui::Text("Value range: %.6f to %.6f", reader.currentField.min_value, reader.currentField.max_value);
 
             ImGui::Separator();
-            
+
             // Visualization
             ImGui::Begin("Visualization Settings");
             {
