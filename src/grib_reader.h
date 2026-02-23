@@ -57,7 +57,12 @@ enum class SortKey
     Name,
     ShortName,
     IndicatorOfParameter,
+    IndicatorOfTypeOfLevel,
     ParameterNumber,
+    ParameterCategory,
+    Discipline,
+    TypeOfLevel,
+    typeOfFirstFixedSurface,
     Level,
     PerturbationNumber
 };

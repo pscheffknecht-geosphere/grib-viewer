@@ -58,6 +58,16 @@ bool compareByKey(const GribMessageInfo& a,
             return a.level < b.level;
         case SortKey::PerturbationNumber:
             return a.perturbationNumber < b.perturbationNumber;
+        case SortKey::IndicatorOfTypeOfLevel:
+            return a.indicatorOfParameter < b.indicatorOfParameter;
+        case SortKey::ParameterCategory:
+            return a.parameterCategory < b.parameterCategory;
+        case SortKey::Discipline:
+            return a.discipline < b.discipline;
+        case SortKey::TypeOfLevel:
+            return a.typeOfLevel < b.typeOfLevel;
+        case SortKey::typeOfFirstFixedSurface:
+            return a.typeOfFirstFixedSurface < b.typeOfFirstFixedSurface;
     }
     return false;
 }
@@ -96,7 +106,12 @@ void gribSortWindow(bool* p_open,
         "Name",
         "ShortName",
         "IndicatorOfParameter",
+        "IndicatorOfTypeOfLevel",
         "ParameterNumber",
+        "parameterCategory",
+        "Discipline",
+        "TypeOfLevel",
+        "typeOfFirstFixedSurface",
         "Level",
         "PerturbationNumber"
     };
