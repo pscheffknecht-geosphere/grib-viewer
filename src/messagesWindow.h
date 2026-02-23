@@ -8,3 +8,6 @@ void gribMessageListWindow(
     bool* p_open,
     const std::vector<GribMessageInfo>& messageList,
     int& currentMessage);
+
+void gribSortWindow(bool *p_open,
+    std::vector<GribMessageInfo>& messageList);

@@ -42,4 +42,101 @@ void gribMessageListWindow(
     ImGui::End();
 }
 
+bool compareByKey(const GribMessageInfo& a,
+                  const GribMessageInfo& b,
+                  SortKey key)
+{
+    switch (key)
+    {
+        case SortKey::Name: return a.name < b.name;
+        case SortKey::ShortName: return a.shortName < b.shortName;
+        case SortKey::IndicatorOfParameter:
+            return a.indicatorOfParameter < b.indicatorOfParameter;
+        case SortKey::ParameterNumber:
+            return a.parameterNumber < b.parameterNumber;
+        case SortKey::Level:
+            return a.level < b.level;
+        case SortKey::PerturbationNumber:
+            return a.perturbationNumber < b.perturbationNumber;
+    }
+    return false;
+}
 
+void sortWithOrder(std::vector<GribMessageInfo>& list,
+                   const std::vector<SortColumn>& order)
+{
+    std::sort(list.begin(), list.end(),
+        [&](const auto& a, const auto& b)
+        {
+            for (const auto& col : order)
+            {
+                if (compareByKey(a, b, col.key))
+                    return col.ascending;
+
+                if (compareByKey(b, a, col.key))
+                    return !col.ascending;
+            }
+            return false;
+        });
+}
+
+void gribSortWindow(bool* p_open,
+                    std::vector<GribMessageInfo>& messageList)
+{
+    if (!ImGui::Begin("Grib Message Sorting", p_open))
+    {
+        ImGui::End();
+        return;
+    }
+
+    static std::vector<SortColumn> sortOrder;
+
+    const char* items[] =
+    {
+        "Name",
+        "ShortName",
+        "IndicatorOfParameter",
+        "ParameterNumber",
+        "Level",
+        "PerturbationNumber"
+    };
+
+    if (ImGui::Button("Add Column"))
+    {
+        sortOrder.push_back({SortKey::Name, true});
+    }
+
+    ImGui::Separator();
+
+    for (size_t i = 0; i < sortOrder.size(); ++i)
+    {
+        ImGui::PushID(static_cast<int>(i));
+
+        int keyIndex = static_cast<int>(sortOrder[i].key);
+
+        ImGui::Combo("Column", &keyIndex, items, IM_ARRAYSIZE(items));
+        sortOrder[i].key = static_cast<SortKey>(keyIndex);
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Asc", &sortOrder[i].ascending);
+
+        ImGui::SameLine();
+        if (ImGui::Button("Remove"))
+        {
+            sortOrder.erase(sortOrder.begin() + i);
+            ImGui::PopID();
+            break;
+        }
+
+        ImGui::PopID();
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Sort"))
+    {
+        sortWithOrder(messageList, sortOrder);
+    }
+
+    ImGui::End();
+}

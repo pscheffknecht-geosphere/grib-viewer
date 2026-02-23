@@ -52,6 +52,22 @@ struct GribMessageInfo
     long perturbationNumber;
 };
 
+enum class SortKey
+{
+    Name,
+    ShortName,
+    IndicatorOfParameter,
+    ParameterNumber,
+    Level,
+    PerturbationNumber
+};
+
+struct SortColumn
+{
+    SortKey key;
+    bool ascending = true;
+};
+
 struct GribMessageSummary
 {
     std::vector<std::string> unique_name;

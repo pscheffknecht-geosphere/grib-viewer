@@ -111,17 +111,6 @@ int main(int argc, char** argv) {
     if (argc > 1) {
         strcpy(filename, argv[1]);
         reader.loadFile(filename, yScanDirectionA, yScanDirectionB);
-        std::sort(reader.messageList.begin(), reader.messageList.end(),
-            [](const auto& a, const auto& b)
-            {
-                if (a.perturbationNumber != b.perturbationNumber)
-                    return a.perturbationNumber < b.perturbationNumber;
-
-                if (a.shortName != b.shortName)
-                    return a.shortName < b.shortName;
-
-                return a.level < b.level;
-            });
         }
 
     // Main loop
@@ -185,6 +174,8 @@ int main(int argc, char** argv) {
             if (ImGui::Button("Show Messages Window")) {
                 showMessageListWindow = !showMessageListWindow;
             }
+            bool showGribSortWindow = true;
+            gribSortWindow(&showGribSortWindow, reader.messageList);
             if (showMessageListWindow) {
                 gribMessageListWindow(&showMessageListWindow, reader.messageList, currentMessage);
             }
