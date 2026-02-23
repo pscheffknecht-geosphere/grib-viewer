@@ -216,8 +216,8 @@ int main(int argc, char** argv) {
                 ImGui::InputInt("Color count (for discrete)", (int*)&settings.colorCount);
             }
             ImGui::End();
-            static int currentGradient = 0;
-            static int previousGradient = 0;
+            static size_t currentGradient = 0;
+            static size_t previousGradient = 0;
             if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str()))
             {
                 for (size_t i = 0; i < mpl_gradient_names.size(); ++i)

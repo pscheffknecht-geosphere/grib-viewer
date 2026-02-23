@@ -35,7 +35,7 @@ struct GribField {
 
 struct GribMessageInfo
 {
-    size_t index;
+    int index;
     std::string name;
     std::string shortName;
     std::string units;
