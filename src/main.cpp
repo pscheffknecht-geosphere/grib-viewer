@@ -254,8 +254,8 @@ int main(int argc, char** argv) {
             }
             
             if (needNewTexture) {
-                displayWidth = reader.currentField.width * settings.displayZoomFactor;
-                displayHeight = reader.currentField.height * settings.displayZoomFactor; 
+                displayWidth = reader.currentField.width;
+                displayHeight = reader.currentField.height; 
                 imgData.resize(displayHeight * displayWidth);
                 glDeleteTextures(1, &fieldTexture);
                 fieldTexture = 0;
@@ -276,7 +276,9 @@ int main(int argc, char** argv) {
                 updateCbarTexture = false;
             }
             ImGui::Image((ImTextureID)(intptr_t)cbarTexture, ImVec2(cbarWidth, cbarHeight));
-            ImGui::Image((ImTextureID)(intptr_t)fieldTexture, ImVec2(displayWidth, displayHeight), yScanDirectionA, yScanDirectionB);
+            ImGui::Image((ImTextureID)(intptr_t)fieldTexture, 
+                ImVec2(displayWidth * settings.displayZoomFactor, displayHeight * settings.displayZoomFactor), 
+                yScanDirectionA, yScanDirectionB);
 
             
             ImGui::EndChild();
