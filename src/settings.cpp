@@ -9,7 +9,8 @@ bool operator==(const GribViewerSettings& lhs, const GribViewerSettings& rhs) {
         lhs.discreteColors == rhs.discreteColors &&
         lhs.colorCount == rhs.colorCount &&
         lhs.sqrtScale == rhs.sqrtScale &&
-        lhs.useCustomMinMax == rhs.useCustomMinMax
+        lhs.useCustomMinMax == rhs.useCustomMinMax &&
+        lhs.oldColorBug == rhs.oldColorBug
     );
 }
 
@@ -21,6 +22,7 @@ bool cmapUpgradeNeeded(const GribViewerSettings& oldSettings, const GribViewerSe
     return (
         oldSettings.sqrtScale != newSettings.sqrtScale ||
         oldSettings.discreteColors != newSettings.discreteColors ||
-        oldSettings.colorCount != newSettings.colorCount
+        oldSettings.colorCount != newSettings.colorCount ||
+        oldSettings.oldColorBug != newSettings.oldColorBug
     );
 }

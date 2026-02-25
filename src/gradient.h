@@ -42,13 +42,20 @@ class Gradient {
     }   
     Gradient(const std::vector<Color>& colors, const std::vector<float>& positions) : colors(colors), positions(positions) {}
     ~Gradient() {}
-    Color get_color(float t) const {
+    Color get_color(float t, bool old_bug = false) const {
         if (t <= positions.front()) return colors.front();
         if (t >= positions.back()) return colors.back();
         for (size_t i = 0; i < positions.size() - 1; ++i) {
             if (t >= positions[i] && t <= positions[i + 1]) {
                 float local_t = (t - positions[i]) / (positions[i + 1] - positions[i]);
-                return linear2srgb(srgb2linear(colors[i + 1]) * local_t + srgb2linear(colors[i]) * (1.f - local_t));
+                if (!old_bug)
+                    return linear2srgb(srgb2linear(colors[i + 1]) * local_t + srgb2linear(colors[i]) * (1.f - local_t));
+                else
+                    return linear2srgb(Color(
+                        colors[i].r + local_t * (colors[i + 1].r - colors[i].r),
+                        colors[i].g + local_t * (colors[i + 1].g - colors[i].g),
+                        colors[i].b + local_t * (colors[i + 1].b - colors[i].b)
+                    ));
             }
         }
         return Color(1.f, 0.f, 1.f); // Should never reach here

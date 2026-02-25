@@ -12,6 +12,8 @@ struct GribViewerSettings {
     size_t colorCount = 25;
     bool sqrtScale = false;
     bool useCustomMinMax = false;
+    // turn old color bug back on for aesthetic reasons
+    bool oldColorBug = false;
 };
 
 bool operator==(const GribViewerSettings& lhs, const GribViewerSettings& rhs);

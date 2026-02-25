@@ -74,7 +74,7 @@ Color valueToColor(double value, double min_val, double max_val, const Gradient&
     if (settings.sqrtScale) normalized = sqrt(normalized);
     
     // Color c = value >= -999999999. ? Color(.7f, 0.f, 0.f) : gradient.get_color(static_cast<float>(normalized));
-    Color c = gradient.get_color(static_cast<float>(normalized));
+    Color c = gradient.get_color(static_cast<float>(normalized), settings.oldColorBug);
     return c;
 }
 
@@ -119,7 +119,7 @@ void Renderer::updateCbar(GLuint texture, const int width, const int height, std
                 cidx = std::floor(cidx * settings.colorCount) / (settings.colorCount - 1.);
             }
             if (settings.sqrtScale) cidx = sqrt(cidx);
-            data[idx] = settings.gradient.get_color(cidx);
+            data[idx] = settings.gradient.get_color(cidx, settings.oldColorBug);
         }
     }
 }

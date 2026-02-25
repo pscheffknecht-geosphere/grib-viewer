@@ -214,6 +214,7 @@ int main(int argc, char** argv) {
                 ImGui::Checkbox("Use sqrt scaling", &settings.sqrtScale);
                 ImGui::Checkbox("Use discrete colors", &settings.discreteColors);
                 ImGui::InputInt("Color count (for discrete)", (int*)&settings.colorCount);
+                ImGui::Checkbox("Old color bug (for aesthetics)", &settings.oldColorBug);
             }
             ImGui::End();
             static size_t currentGradient = 0;
