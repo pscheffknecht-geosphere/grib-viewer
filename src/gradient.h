@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <vector>
+#include <GL/gl.h>
+#include <iostream>
 
 struct Color {
     float r, g, b;
@@ -33,6 +35,8 @@ class Gradient {
     public:
     std::vector<Color> colors;
     std::vector<float> positions; // 0 to 1
+    GLuint previewTexture = 0;
+    std::vector<Color> previewData;
     Gradient() {
         // Default gradient: black to white
         colors.push_back(Color(0.0f));
@@ -41,7 +45,11 @@ class Gradient {
         positions.push_back(1.0f);
     }   
     Gradient(const std::vector<Color>& colors, const std::vector<float>& positions) : colors(colors), positions(positions) {}
-    ~Gradient() {}
+    ~Gradient() {
+        if (previewTexture != 0) {
+            glDeleteTextures(1, &previewTexture);
+        }
+    }
     Color get_color(float t, bool old_bug = false) const {
         if (t <= positions.front()) return colors.front();
         if (t >= positions.back()) return colors.back();
@@ -59,6 +67,30 @@ class Gradient {
             }
         }
         return Color(1.f, 0.f, 1.f); // Should never reach here
+    }
+    void makePreview() {
+        // Create a 256x1 preview texture
+        const int previewWidth = 256;
+        const int previewHeight = 16;
+        previewData.resize(previewWidth * previewHeight);
+        for (int x = 0; x < previewWidth; ++x) {
+            float t = static_cast<float>(x) / (previewWidth - 1);
+            Color col = get_color(t);
+            for (int y = 0; y < previewHeight; ++y) {
+                previewData[y * previewWidth + x] = col;
+            }
+        }
+        if (previewTexture == 0)
+            glGenTextures(1, &previewTexture);
+        
+        glBindTexture(GL_TEXTURE_2D, previewTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, previewWidth, previewHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, previewWidth, previewHeight, GL_RGB, GL_FLOAT, previewData.data());
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 };
 

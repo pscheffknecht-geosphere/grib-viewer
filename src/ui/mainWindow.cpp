@@ -26,6 +26,14 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
     static GribViewerSettings settings;
     static GribViewerSettings settings_old;
 
+    static bool genGradientPreview = true;
+    if (genGradientPreview) {
+        for ( auto& grad : mpl_gradients) {
+            grad.makePreview();
+        }
+        genGradientPreview = false;
+    }
+
     glfwPollEvents();
     // ImGuiID dockspace_id = ImGui::GetID("GRIB Viewer");
     // Start ImGui frame
@@ -125,6 +133,10 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
                     currentGradient = i;
                     settings.gradient = mpl_gradients[i];
                 }
+
+                ImGui::SameLine(200);
+
+                ImGui::Image((ImTextureID)(intptr_t)mpl_gradients[i].previewTexture, ImVec2(200, 18));
 
                 if (is_selected) ImGui::SetItemDefaultFocus();
             }
