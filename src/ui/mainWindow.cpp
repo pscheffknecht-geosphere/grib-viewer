@@ -72,7 +72,7 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
     // File selection
     ImGui::Text("GRIB File:");
     ImGui::SameLine();
-    ImGui::InputText("##filename", filename, sizeof(filename));
+    ImGui::InputText("##filename", filename, sizeof(*filename));
     ImGui::SameLine();
 
     if (ImGui::Button("Load")) {
