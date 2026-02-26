@@ -60,7 +60,8 @@ set(SOURCES
     src/renderer.cpp
     src/mpl_gradients.cpp
 	src/settings.cpp
-    src/messagesWindow.cpp
+    src/ui/mainWindow.cpp
+    src/ui/messagesWindow.cpp
 )
 
 set(HEADERS
@@ -69,7 +70,8 @@ set(HEADERS
     src/mpl_gradients.h
     src/gradient.h
     src/settings.h
-	src/messagesWindow.h
+    src/ui/mainWindow.h
+	src/ui/messagesWindow.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
