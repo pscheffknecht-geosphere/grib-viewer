@@ -117,7 +117,7 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
         ImGui::End();
         static size_t currentGradient = 0;
         static size_t previousGradient = 0;
-        if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str())) {
+        if (ImGui::BeginCombo("Gradient", mpl_gradient_names[currentGradient].c_str(), ImGuiComboFlags_HeightLarge)) {
             for (size_t i = 0; i < mpl_gradient_names.size(); ++i) {
                 bool is_selected = (currentGradient == i);
 
@@ -171,7 +171,8 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
             updateCbarTexture = false;
         }
         ImGui::Image((ImTextureID)(intptr_t)cbarTexture, ImVec2(cbarWidth, cbarHeight));
-        ImGui::Begin("Field Display", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::Begin("Field Display", nullptr, ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_AlwaysVerticalScrollbar);
+            //ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::Image((ImTextureID)(intptr_t)fieldTexture,
                      ImVec2(displayWidth * settings.displayZoomFactor,
                             displayHeight * settings.displayZoomFactor),
