@@ -62,6 +62,7 @@ set(SOURCES
 	src/settings.cpp
     src/ui/mainWindow.cpp
     src/ui/messagesWindow.cpp
+    src/ui/visualizationSettingsWindow.cpp
 )
 
 set(HEADERS
@@ -72,6 +73,7 @@ set(HEADERS
     src/settings.h
     src/ui/mainWindow.h
 	src/ui/messagesWindow.h
+    src/ui/visualizationSettingsWindow.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
