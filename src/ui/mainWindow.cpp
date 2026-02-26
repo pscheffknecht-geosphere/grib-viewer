@@ -171,11 +171,12 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
             updateCbarTexture = false;
         }
         ImGui::Image((ImTextureID)(intptr_t)cbarTexture, ImVec2(cbarWidth, cbarHeight));
+        ImGui::Begin("Field Display", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::Image((ImTextureID)(intptr_t)fieldTexture,
                      ImVec2(displayWidth * settings.displayZoomFactor,
                             displayHeight * settings.displayZoomFactor),
                      reader.currentField.uv1, reader.currentField.uv2);
-
+        ImGui::End();
         ImGui::EndChild();
     } else {
         ImGui::Text("No GRIB file loaded.");
