@@ -10,6 +10,8 @@
 #include <vector>
 #include <memory>
 
+#include <imgui.h>
+
 struct GribField {
     std::string name;
     std::string shortName;
@@ -29,8 +31,19 @@ struct GribField {
     double min_value;
     double max_value;
     bool jScansPositively = true;
-    
-    GribField() : width(0), height(0), min_value(0.0), max_value(0.0) {}
+    ImVec2 uv1;
+    ImVec2 uv2;
+
+    GribField() : width(0), height(0), min_value(0.0), max_value(0.0) {processScanDirections();}
+    void processScanDirections() {
+        if (jScansPositively) {
+            uv1 = ImVec2(0, 1);
+            uv2 = ImVec2(1, 0);
+        } else {
+            uv1 = ImVec2(0, 0);
+            uv2 = ImVec2(1, 1);
+        }
+    }
 };
 
 struct GribMessageInfo
@@ -101,7 +114,7 @@ public:
     ~GribReader();
     
     bool openFile(const std::string& filename);
-    void loadFile(char filename[512], ImVec2& yScanDirectionA, ImVec2& yScanDirectionB);
+    void loadFile(char filename[512]);
     void close();
     
     int getMessageCount() const;

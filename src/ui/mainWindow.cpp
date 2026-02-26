@@ -69,7 +69,7 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
 
     if (ImGui::Button("Load")) {
         reader.close();
-        reader.loadFile(filename, yScanDirectionA, yScanDirectionB);
+        reader.loadFile(filename);
     }
 
     ImGui::Separator();
@@ -186,7 +186,7 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
         ImGui::Image((ImTextureID)(intptr_t)fieldTexture,
                      ImVec2(displayWidth * settings.displayZoomFactor,
                             displayHeight * settings.displayZoomFactor),
-                     yScanDirectionA, yScanDirectionB);
+                     reader.currentField.uv1, reader.currentField.uv2);
 
         ImGui::EndChild();
     } else {

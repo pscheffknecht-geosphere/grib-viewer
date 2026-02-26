@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
 
     if (argc > 1) {
         strcpy(filename, argv[1]);
-        reader.loadFile(filename, yScanDirectionA, yScanDirectionB);
+        reader.loadFile(filename);
         }
 
     // Main loop

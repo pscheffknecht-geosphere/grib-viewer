@@ -22,20 +22,13 @@ bool GribReader::openFile(const std::string& fname) {
     return true;
 }
 
-void GribReader::loadFile(char filename[512], ImVec2& yScanDirectionA, ImVec2& yScanDirectionB) {
+void GribReader::loadFile(char filename[512]) {
     if (openFile(filename)) {
         fileLoaded = true;
         messageCount = getMessageCount();
         if (messageCount > 0) {
             getMessageOffsets();
             readField(0, currentField);
-            if (currentField.jScansPositively == 1) {
-                yScanDirectionA = ImVec2(0, 1);
-                yScanDirectionB = ImVec2(1, 0);
-            } else {
-                yScanDirectionA = ImVec2(0, 0);
-                yScanDirectionB = ImVec2(1, 1);
-            }
         }
         messageList.clear();
         for (int i = 0; i < messageCount; ++i) {
