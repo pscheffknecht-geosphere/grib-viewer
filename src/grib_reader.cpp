@@ -173,6 +173,9 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     field.max_value = *std::max_element(field.values.begin(), field.values.end());
     
     codes_handle_delete(h);
+
+    field.processScanDirections();
+
     return true;
 }
 
