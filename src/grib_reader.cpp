@@ -34,7 +34,6 @@ void GribReader::loadFile(char filename[512]) {
         for (int i = 0; i < messageCount; ++i) {
             GribMessageInfo info;
             readFieldMetadata(i, info);  // lightweight version
-            info.index = i;
             messageList.push_back(info);
         }
     }
@@ -185,6 +184,8 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
         return false;
     }
     
+    info.indexInFile = messageIndex;
+
     FILE* f = static_cast<FILE*>(fileHandle);
 
     fseek(f, messageOffsets[messageIndex], SEEK_SET);
@@ -225,6 +226,14 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
     if (! readCode(h, "perturbationNumber", info.perturbationNumber))
         info.perturbationNumber = -1;
 
+    std::string stepType;
+    if (!readCode(h, "stepType", stepType))
+        stepType = "~";
+
+    if (stepType == "min" || stepType == "max" || stepType == "avg") {
+        info.shortName += "_" + stepType;
+    }
+    
     codes_handle_delete(h);
     return true;
 }

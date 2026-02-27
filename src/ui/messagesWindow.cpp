@@ -34,8 +34,8 @@ void gribMessageListWindow(
                 "[" + std::to_string(i + 1) + "] " + memberInfo +
                 meta.shortName + " | (" + meta.name + ") [" + meta.units + "] on " + 
                 meta.typeOfLevel + " = " + std::to_string(meta.level) + " " + numberInfo;
-            if (ImGui::Selectable(label.c_str(), currentMessage == meta.index))
-                currentMessage = meta.index;
+            if (ImGui::Selectable(label.c_str(), currentMessage == meta.indexInFile))
+                currentMessage = meta.indexInFile;
         }
     }
 
@@ -68,6 +68,8 @@ bool compareByKey(const GribMessageInfo& a,
             return a.typeOfLevel < b.typeOfLevel;
         case SortKey::typeOfFirstFixedSurface:
             return a.typeOfFirstFixedSurface < b.typeOfFirstFixedSurface;
+        case SortKey::IndexInFile:
+            return a.indexInFile < b.indexInFile;
     }
     return false;
 }
@@ -102,7 +104,7 @@ void gribSortWindow(bool* p_open,
     static std::vector<SortColumn> sortOrder;
 
     const char* items[] =
-    {
+    {   
         "Name",
         "ShortName",
         "IndicatorOfParameter",
@@ -113,7 +115,8 @@ void gribSortWindow(bool* p_open,
         "TypeOfLevel",
         "typeOfFirstFixedSurface",
         "Level",
-        "PerturbationNumber"
+        "PerturbationNumber",
+        "IndexInFile"
     };
 
     if (ImGui::Button("Add Column"))

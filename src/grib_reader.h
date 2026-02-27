@@ -48,7 +48,7 @@ struct GribField {
 
 struct GribMessageInfo
 {
-    int index;
+    int indexInFile;
     std::string name;
     std::string shortName;
     std::string units;
@@ -77,7 +77,8 @@ enum class SortKey
     TypeOfLevel,
     typeOfFirstFixedSurface,
     Level,
-    PerturbationNumber
+    PerturbationNumber,
+    IndexInFile
 };
 
 struct SortColumn
