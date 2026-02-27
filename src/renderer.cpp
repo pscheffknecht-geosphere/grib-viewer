@@ -86,9 +86,21 @@ void Renderer::renderField(const GribField& field, int displayWidth, int display
         return;
     }
     
-    float colorMinValue = settings.useCustomMinMax ? settings.minVal : field.min_value;
-    float colorMaxValue = settings.useCustomMinMax ? settings.maxVal : field.max_value;
-
+    float colorMinValue = 0.f;
+    float colorMaxValue = 0.f;
+    if (settings.useCustomMinMax || settings.symmetricAroundZero) {
+        if (settings.minVal >= settings.maxVal) {
+            ImGui::Text("Invalid custom min/max values");
+            return;
+        } else {
+            colorMinValue = settings.minVal;
+            colorMaxValue = settings.maxVal;
+        }
+    }
+    else {
+        colorMinValue = static_cast<float>(field.min_value);
+        colorMaxValue = static_cast<float>(field.max_value);
+    }
     // Fill each pixel
     # pragma omp parallel for
     for (int y = 0; y < displayHeight; ++y) {

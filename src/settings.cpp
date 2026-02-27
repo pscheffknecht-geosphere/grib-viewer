@@ -10,6 +10,7 @@ bool operator==(const GribViewerSettings& lhs, const GribViewerSettings& rhs) {
         lhs.colorCount == rhs.colorCount &&
         lhs.sqrtScale == rhs.sqrtScale &&
         lhs.useCustomMinMax == rhs.useCustomMinMax &&
+        lhs.symmetricAroundZero == rhs.symmetricAroundZero &&
         lhs.oldColorBug == rhs.oldColorBug
     );
 }

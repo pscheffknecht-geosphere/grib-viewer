@@ -118,10 +118,11 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
         ImGui::Text("Dimensions: %ld x %ld", reader.currentField.width, reader.currentField.height);
         ImGui::Text("Value range: %.6f to %.6f", reader.currentField.min_value,
                     reader.currentField.max_value);
+        ImGui::Text("Plot value range: %.6f to %.6f", settings.minVal, settings.maxVal);
 
         ImGui::Separator();
 
-        visualizationSettingsWindow(settings);
+        visualizationSettingsWindow(settings, reader.currentField);
         ImGui::End();
         static size_t currentGradient = 0;
         static size_t previousGradient = 0;
