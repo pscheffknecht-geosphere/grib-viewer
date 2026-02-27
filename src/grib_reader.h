@@ -86,24 +86,6 @@ struct SortColumn
     bool ascending = true;
 };
 
-struct GribMessageSummary
-{
-    std::vector<std::string> unique_name;
-    std::vector<std::string> unique_shortName;
-    std::vector<std::string> unique_units;
-    std::vector<std::string> unique_indicatorOfTypeOfLevel;
-    std::vector<std::string> unique_typeOfLevel;
-    std::vector<std::string> unique_typeOfFirstFixedSurface;
-    std::vector<long> level;
-    std::vector<long> width;
-    std::vector<long> height;
-    std::vector<long> indicatorOfParameter;
-    std::vector<long> parameterNumber;
-    std::vector<long> discipline;
-    std::vector<long> parameterCategory;
-};
-
-
 class GribReader {
 public:
     bool fileLoaded = false;
