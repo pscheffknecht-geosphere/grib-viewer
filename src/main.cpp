@@ -38,7 +38,8 @@ int main(int argc, char** argv) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    // Keyboard nav disabled — arrow keys are handled manually for message navigation
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // <-- ADD THIS
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // optional
 

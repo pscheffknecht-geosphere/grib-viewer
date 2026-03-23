@@ -1,6 +1,6 @@
 #include "messagesWindow.h" 
 
-void gribMessageListWindow(  
+void gribMessageListWindow(
     bool* p_open,
     const std::vector<GribMessageInfo>& messageList,
     int& currentMessage)
@@ -10,9 +10,27 @@ void gribMessageListWindow(
         ImGui::End();
         return;
     }
-   
+
+    static int previousMessage = -1;
+    bool selectionChanged = (currentMessage != previousMessage);
+    previousMessage = currentMessage;
+
+    // When selection changed, force the clipper to include the selected row
+    // so we can scroll to it if it's off-screen
+    int selectedRow = -1;
+    if (selectionChanged) {
+        for (int i = 0; i < static_cast<int>(messageList.size()); ++i) {
+            if (messageList[i].indexInFile == currentMessage) {
+                selectedRow = i;
+                break;
+            }
+        }
+    }
+
     ImGuiListClipper clipper;
     clipper.Begin(messageList.size());
+    if (selectedRow >= 0)
+        clipper.ForceDisplayRangeByIndices(selectedRow, selectedRow + 1);
 
     while (clipper.Step())
     {
@@ -24,18 +42,29 @@ void gribMessageListWindow(
             if (meta.indicatorOfParameter >= 0)
                 numberInfo = "(ioP: " + std::to_string(meta.indicatorOfParameter) + ")";
             else if (meta.parameterNumber >= 0)
-                numberInfo = 
-                  "(PN: "  + std::to_string(meta.parameterNumber) + 
-                ", Cat: "  + std::to_string(meta.parameterCategory) + 
+                numberInfo =
+                  "(PN: "  + std::to_string(meta.parameterNumber) +
+                ", Cat: "  + std::to_string(meta.parameterCategory) +
                 ", Disc: " + std::to_string(meta.discipline) + ")";
             if (meta.perturbationNumber > 0)
                 memberInfo = "[M" + std::to_string(meta.perturbationNumber)+ "] ";
             std::string label =
                 "[" + std::to_string(i + 1) + "] " + memberInfo +
-                meta.shortName + " | (" + meta.name + ") [" + meta.units + "] on " + 
+                meta.shortName + " | (" + meta.name + ") [" + meta.units + "] on " +
                 meta.typeOfLevel + " = " + std::to_string(meta.level) + " " + numberInfo;
-            if (ImGui::Selectable(label.c_str(), currentMessage == meta.indexInFile))
+            bool isSelected = currentMessage == meta.indexInFile;
+            if (ImGui::Selectable(label.c_str(), isSelected))
                 currentMessage = meta.indexInFile;
+            if (isSelected && selectionChanged) {
+                float itemMin = ImGui::GetItemRectMin().y;
+                float itemMax = ImGui::GetItemRectMax().y;
+                float windowMin = ImGui::GetWindowPos().y;
+                float windowMax = windowMin + ImGui::GetWindowSize().y;
+                if (itemMin < windowMin)
+                    ImGui::SetScrollHereY(0.0f);
+                else if (itemMax > windowMax)
+                    ImGui::SetScrollHereY(1.0f);
+            }
         }
     }
 

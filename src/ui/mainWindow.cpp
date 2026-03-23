@@ -135,7 +135,24 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
         if (showMessageListWindow) {
             gribMessageListWindow(&showMessageListWindow, reader.messageList, currentMessage);
         }
-        // Message selection
+        // Message selection via arrow keys (navigate in sorted list order)
+        if (!ImGui::GetIO().WantTextInput) {
+            if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) || ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
+                int pos = -1;
+                for (int i = 0; i < static_cast<int>(reader.messageList.size()); ++i) {
+                    if (reader.messageList[i].indexInFile == currentMessage) {
+                        pos = i;
+                        break;
+                    }
+                }
+                if (pos >= 0) {
+                    if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && pos < static_cast<int>(reader.messageList.size()) - 1)
+                        currentMessage = reader.messageList[pos + 1].indexInFile;
+                    else if (ImGui::IsKeyPressed(ImGuiKey_UpArrow) && pos > 0)
+                        currentMessage = reader.messageList[pos - 1].indexInFile;
+                }
+            }
+        }
         ImGui::Text("Message: %d / %d", currentMessage + 1, reader.messageCount);
         ImGui::SliderInt("##message", &currentMessage, 0, reader.messageCount - 1);
         if (currentMessage != previousMessage) {
