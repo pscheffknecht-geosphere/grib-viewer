@@ -53,32 +53,76 @@ void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-    ImGui::Begin("DockSpaceHost", nullptr, window_flags);
+    ImGui::Begin("DockSpaceHost", nullptr, window_flags | ImGuiWindowFlags_MenuBar);
 
     ImGui::PopStyleVar(2);
+
+    // Menu bar actions (triggered by menu items or keyboard shortcuts)
+    bool doOpen = false;
+    bool doExport = false;
+    bool doCopy = false;
+
+    // Keyboard shortcuts (check before menu so they work even when menu is closed)
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_O)) doOpen = true;
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_E)) doExport = true;
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_C)) doCopy = true;
+
+    // Menu bar
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Open", "Ctrl+O")) doOpen = true;
+            if (ImGui::MenuItem("Export Image", "Ctrl+E", false, !imgData.empty())) doExport = true;
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            if (ImGui::MenuItem("Copy Image", "Ctrl+C", false, !imgData.empty())) doCopy = true;
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    // Handle actions
+    if (doOpen) {
+        const char* filters[] = { "*.grib", "*.grib2", "*.grb", "*.grb2", "*" };
+        const char* selected = tinyfd_openFileDialog(
+            "Open GRIB File", "", 5, filters, "GRIB Files", 0);
+        if (selected) {
+            strncpy(filename, selected, 511);
+            filename[511] = '\0';
+            reader.close();
+            reader.loadFile(filename);
+            currentMessage = 0;
+            previousMessage = -1;
+            needNewTexture = true;
+            updateCbarTexture = true;
+        }
+    }
+    if (doExport && !imgData.empty()) {
+        const char* filters[] = { "*.png" };
+        const char* selected = tinyfd_saveFileDialog(
+            "Export Image", "export.png", 1, filters, "PNG Images");
+        if (selected) {
+            if (exportImagePng(selected, displayWidth, displayHeight, imgData, reader.currentField.jScansPositively)) {
+                std::cout << "Exported image to " << selected << std::endl;
+            } else {
+                std::cerr << "Failed to export image to " << selected << std::endl;
+            }
+        }
+    }
+    if (doCopy && !imgData.empty()) {
+        if (copyImageToClipboard(displayWidth, displayHeight, imgData, reader.currentField.jScansPositively)) {
+            std::cout << "Image copied to clipboard" << std::endl;
+        } else {
+            std::cerr << "Failed to copy image to clipboard" << std::endl;
+        }
+    }
 
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
     ImGui::End();
     // Main window
-    // ImGui::SetNextWindowPos(ImVec2(0, 0));
-    // ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-    ImGui::Begin("GRIB Viewer"); /*, nullptr,
-                 ImGuiWindowFlags_NoTitleBar |
-                 ImGuiWindowFlags_NoResize |
-                 ImGuiWindowFlags_NoMove); */
-
-    // File selection
-    ImGui::Text("GRIB File:");
-    ImGui::SameLine();
-    ImGui::InputText("##filename", filename, sizeof(*filename));
-    ImGui::SameLine();
-
-    if (ImGui::Button("Load")) {
-        reader.close();
-        reader.loadFile(filename);
-    }
+    ImGui::Begin("GRIB Viewer");
 
     ImGui::Separator();
     static bool updateImg = false;

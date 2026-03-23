@@ -10,8 +10,11 @@
 #include "renderer.h"
 #include "settings.h"
 
+#include <tinyfiledialogs.h>
+
 #include "messagesWindow.h"
 #include "visualizationSettingsWindow.h"
+#include "export_image.h"
 
 void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
                     ImVec2& yScanDirectionA, ImVec2& yScanDirectionB, GLFWwindow* window,

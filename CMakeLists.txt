@@ -43,6 +43,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(imgui CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Stb REQUIRED)
+find_package(tinyfiledialogs CONFIG REQUIRED)
 
 # eccodes library (GRIB library)
 # We'll link to system-installed eccodes or build from source
@@ -62,6 +64,7 @@ set(SOURCES
     src/renderer.cpp
     src/mpl_gradients.cpp
 	src/settings.cpp
+    src/export_image.cpp
     src/ui/mainWindow.cpp
     src/ui/messagesWindow.cpp
     src/ui/visualizationSettingsWindow.cpp
@@ -73,6 +76,7 @@ set(HEADERS
     src/mpl_gradients.h
     src/gradient.h
     src/settings.h
+    src/export_image.h
     src/ui/mainWindow.h
 	src/ui/messagesWindow.h
     src/ui/visualizationSettingsWindow.h
@@ -89,6 +93,7 @@ set_source_files_properties(
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${ECCODES_INCLUDE}
+    ${Stb_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -96,6 +101,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     OpenGL::GL
     ${ECCODES_LIB}
+    tinyfiledialogs::tinyfiledialogs
     m
     pthread
     gomp
