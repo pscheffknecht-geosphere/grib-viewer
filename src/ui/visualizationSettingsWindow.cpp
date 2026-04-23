@@ -26,10 +26,18 @@ void visualizationSettingsWindow(GribViewerSettings& settings, GribField& field)
 
         ImGui::Separator();
         ImGui::Text("HCL color adjustments:");
+        auto resetOnDoubleClick = [](float* v, float def) {
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                *v = def;
+        };
         ImGui::SliderFloat("Brightness", &settings.brightness, 0.0f, 2.0f, "%.2f");
+        resetOnDoubleClick(&settings.brightness, 1.0f);
         ImGui::SliderFloat("Gamma", &settings.gamma, 0.1f, 3.0f, "%.2f");
+        resetOnDoubleClick(&settings.gamma, 1.0f);
         ImGui::SliderFloat("Vibrancy", &settings.vibrancy, 0.0f, 2.0f, "%.2f");
+        resetOnDoubleClick(&settings.vibrancy, 1.0f);
         ImGui::SliderFloat("Hue shift", &settings.hueShift, -180.0f, 180.0f, "%.1f deg");
+        resetOnDoubleClick(&settings.hueShift, 0.0f);
         if (ImGui::Button("Reset HCL")) {
             settings.brightness = 1.0f;
             settings.gamma = 1.0f;
