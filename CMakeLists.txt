@@ -61,6 +61,7 @@ endif()
 set(SOURCES
     src/main.cpp
     src/grib_reader.cpp
+    src/grib_collection.cpp
     src/renderer.cpp
     src/mpl_gradients.cpp
 	src/settings.cpp
@@ -72,9 +73,11 @@ set(SOURCES
 
 set(HEADERS
     src/grib_reader.h
+    src/grib_collection.h
     src/renderer.h
     src/mpl_gradients.h
     src/gradient.h
+    src/color_adjust.h
     src/settings.h
     src/export_image.h
     src/ui/mainWindow.h

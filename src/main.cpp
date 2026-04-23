@@ -82,24 +82,28 @@ int main(int argc, char** argv) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Application state
-    GribReader reader;
+    GribCollection collection;
     Renderer renderer;
     char filename[512] = "";
 
 
-    // Load file from command line if provided
-    std::vector<long> messageOffsets;
+    // Load files from command line if provided
     static ImVec2 yScanDirectionA = ImVec2(0, 0);
     static ImVec2 yScanDirectionB = ImVec2(1, 1);
 
     if (argc > 1) {
-        strcpy(filename, argv[1]);
-        reader.loadFile(filename);
+        std::vector<std::string> paths;
+        for (int i = 1; i < argc; ++i) paths.emplace_back(argv[i]);
+        collection.beginLoad(paths);
+        if (!paths.empty()) {
+            strncpy(filename, paths.front().c_str(), sizeof(filename) - 1);
+            filename[sizeof(filename) - 1] = '\0';
         }
+    }
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        showMainwindow(renderer, filename, reader, yScanDirectionA, yScanDirectionB, window, io);
+        showMainwindow(renderer, filename, collection, yScanDirectionA, yScanDirectionB, window, io);
     }
 
     // Cleanup

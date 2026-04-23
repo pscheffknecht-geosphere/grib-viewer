@@ -6,9 +6,11 @@
 #include <imgui_impl_opengl3.h>
 
 #include "grib_reader.h"
+#include "grib_collection.h"
 #include "mpl_gradients.h"
 #include "renderer.h"
 #include "settings.h"
+#include "color_adjust.h"
 
 #include <tinyfiledialogs.h>
 
@@ -16,7 +18,7 @@
 #include "visualizationSettingsWindow.h"
 #include "export_image.h"
 
-void showMainwindow(Renderer& renderer, char filename[512], GribReader& reader,
+void showMainwindow(Renderer& renderer, char filename[512], GribCollection& collection,
                     ImVec2& yScanDirectionA, ImVec2& yScanDirectionB, GLFWwindow* window,
                     ImGuiIO& io);
 

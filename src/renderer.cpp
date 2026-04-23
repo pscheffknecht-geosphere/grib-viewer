@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+#include "color_adjust.h"
+
 
 Renderer::Renderer() {
 }
@@ -75,7 +77,8 @@ Color valueToColor(double value, double min_val, double max_val, const Gradient&
     
     // Color c = value >= -999999999. ? Color(.7f, 0.f, 0.f) : gradient.get_color(static_cast<float>(normalized));
     Color c = gradient.get_color(static_cast<float>(normalized), settings.oldColorBug);
-    return c;
+    return applyHclAdjustments(c, settings.brightness, settings.gamma,
+                               settings.vibrancy, settings.hueShift);
 }
 
 
@@ -131,7 +134,9 @@ void Renderer::updateCbar(GLuint texture, const int width, const int height, std
                 cidx = std::floor(cidx * settings.colorCount) / (settings.colorCount - 1.);
             }
             if (settings.sqrtScale) cidx = sqrt(cidx);
-            data[idx] = settings.gradient.get_color(cidx, settings.oldColorBug);
+            Color c = settings.gradient.get_color(cidx, settings.oldColorBug);
+            data[idx] = applyHclAdjustments(c, settings.brightness, settings.gamma,
+                                            settings.vibrancy, settings.hueShift);
         }
     }
 }

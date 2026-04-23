@@ -15,6 +15,11 @@ struct GribViewerSettings {
     bool symmetricAroundZero = false;
     // turn old color bug back on for aesthetic reasons
     bool oldColorBug = false;
+    // HCL color adjustments applied after gradient lookup
+    float brightness = 1.0f;
+    float gamma = 1.0f;
+    float vibrancy = 1.0f;
+    float hueShift = 0.0f;
 };
 
 bool operator==(const GribViewerSettings& lhs, const GribViewerSettings& rhs);

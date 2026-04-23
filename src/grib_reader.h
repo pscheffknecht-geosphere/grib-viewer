@@ -49,6 +49,8 @@ struct GribField {
 struct GribMessageInfo
 {
     int indexInFile;
+    size_t fileIdx = 0;
+    size_t globalIndex = 0;
     std::string name;
     std::string shortName;
     std::string units;
@@ -63,6 +65,12 @@ struct GribMessageInfo
     long discipline;
     long parameterCategory;
     long perturbationNumber;
+    long step = 0;
+    std::string stepUnits;
+    long dataDate = 0;
+    long dataTime = 0;
+    long validityDate = 0;
+    long validityTime = 0;
 };
 
 enum class SortKey
@@ -78,7 +86,10 @@ enum class SortKey
     typeOfFirstFixedSurface,
     Level,
     PerturbationNumber,
-    IndexInFile
+    IndexInFile,
+    Step,
+    ValidityDateTime,
+    FileIdx
 };
 
 struct SortColumn
@@ -105,6 +116,7 @@ public:
     bool get_value(const codes_handle* h, const char* value_name, const int* value, const int& len);
     bool readField(int messageIndex, GribField& field);
     bool readFieldMetadata(const int messageIndex, GribMessageInfo& field);
+    void decodeMetadata(codes_handle* h, GribMessageInfo& info);
 
     bool readCode(codes_handle* h, const char* name, std::string& value);
     bool readCode(codes_handle* h, const char* name, long& value);

@@ -23,20 +23,31 @@ bool GribReader::openFile(const std::string& fname) {
 }
 
 void GribReader::loadFile(char filename[512]) {
-    if (openFile(filename)) {
-        fileLoaded = true;
-        messageCount = getMessageCount();
-        if (messageCount > 0) {
-            getMessageOffsets();
-            readField(0, currentField);
-        }
-        messageList.clear();
-        for (int i = 0; i < messageCount; ++i) {
-            GribMessageInfo info;
-            readFieldMetadata(i, info);  // lightweight version
-            messageList.push_back(info);
-        }
+    if (!openFile(filename)) return;
+    fileLoaded = true;
+
+    FILE* f = static_cast<FILE*>(fileHandle);
+    fseek(f, 0, SEEK_SET);
+
+    messageOffsets.clear();
+    messageList.clear();
+
+    int err = 0;
+    while (true) {
+        long offset = ftell(f);
+        codes_handle* h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
+        if (!h) break;
+
+        GribMessageInfo info;
+        info.indexInFile = static_cast<int>(messageOffsets.size());
+        decodeMetadata(h, info);
+        messageOffsets.push_back(offset);
+        messageList.push_back(std::move(info));
+
+        codes_handle_delete(h);
     }
+
+    messageCount = static_cast<int>(messageOffsets.size());
 }
 
 void GribReader::close() {
@@ -178,23 +189,7 @@ bool GribReader::readField(int messageIndex, GribField& field) {
     return true;
 }
 
-bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info) {
-    if (!fileHandle) {
-        lastError = "No file open";
-        return false;
-    }
-    
-    info.indexInFile = messageIndex;
-
-    FILE* f = static_cast<FILE*>(fileHandle);
-
-    fseek(f, messageOffsets[messageIndex], SEEK_SET);
-
-    int err = 0;
-    codes_handle* h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
-    if (!h) return false;
-    
-    // Read metadata (same as in readField but without values)
+void GribReader::decodeMetadata(codes_handle* h, GribMessageInfo& info) {
     if (! readCode(h, "name", info.name))
         info.name = "~";
     if (! readCode(h, "shortName", info.shortName))
@@ -208,11 +203,10 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
     if (! readCode(h, "typeOfFirstFixedSurface", info.typeOfFirstFixedSurface))
         info.typeOfFirstFixedSurface = "~";
 
-    // Get dimensions
     if (! readCode(h, "Ni", info.width))
-        info.discipline = -1;
+        info.width = -1;
     if (! readCode(h, "Nj", info.height))
-        info.discipline = -1;
+        info.height = -1;
     if (! readCode(h, "level", info.level))
         info.level = -1;
     if (! readCode(h, "discipline", info.discipline))
@@ -226,6 +220,19 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
     if (! readCode(h, "perturbationNumber", info.perturbationNumber))
         info.perturbationNumber = -1;
 
+    if (! readCode(h, "step", info.step))
+        info.step = 0;
+    if (! readCode(h, "stepUnits", info.stepUnits))
+        info.stepUnits = "";
+    if (! readCode(h, "dataDate", info.dataDate))
+        info.dataDate = 0;
+    if (! readCode(h, "dataTime", info.dataTime))
+        info.dataTime = 0;
+    if (! readCode(h, "validityDate", info.validityDate))
+        info.validityDate = 0;
+    if (! readCode(h, "validityTime", info.validityTime))
+        info.validityTime = 0;
+
     std::string stepType;
     if (!readCode(h, "stepType", stepType))
         stepType = "~";
@@ -233,7 +240,24 @@ bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info
     if (stepType == "min" || stepType == "max" || stepType == "avg") {
         info.shortName += "_" + stepType;
     }
-    
+}
+
+bool GribReader::readFieldMetadata(const int messageIndex, GribMessageInfo& info) {
+    if (!fileHandle) {
+        lastError = "No file open";
+        return false;
+    }
+
+    info.indexInFile = messageIndex;
+
+    FILE* f = static_cast<FILE*>(fileHandle);
+    fseek(f, messageOffsets[messageIndex], SEEK_SET);
+
+    int err = 0;
+    codes_handle* h = codes_handle_new_from_file(nullptr, f, PRODUCT_GRIB, &err);
+    if (!h) return false;
+
+    decodeMetadata(h, info);
     codes_handle_delete(h);
     return true;
 }

@@ -20,7 +20,7 @@ void gribMessageListWindow(
     int selectedRow = -1;
     if (selectionChanged) {
         for (int i = 0; i < static_cast<int>(messageList.size()); ++i) {
-            if (messageList[i].indexInFile == currentMessage) {
+            if (static_cast<int>(messageList[i].globalIndex) == currentMessage) {
                 selectedRow = i;
                 break;
             }
@@ -48,13 +48,16 @@ void gribMessageListWindow(
                 ", Disc: " + std::to_string(meta.discipline) + ")";
             if (meta.perturbationNumber > 0)
                 memberInfo = "[M" + std::to_string(meta.perturbationNumber)+ "] ";
+            std::string fileTag = "[f" + std::to_string(meta.fileIdx) + "]";
+            std::string stepTag = " step=" + std::to_string(meta.step) +
+                                  (meta.stepUnits.empty() ? "" : meta.stepUnits);
             std::string label =
-                "[" + std::to_string(i + 1) + "] " + memberInfo +
+                "[" + std::to_string(i + 1) + "] " + fileTag + stepTag + " " + memberInfo +
                 meta.shortName + " | (" + meta.name + ") [" + meta.units + "] on " +
                 meta.typeOfLevel + " = " + std::to_string(meta.level) + " " + numberInfo;
-            bool isSelected = currentMessage == meta.indexInFile;
+            bool isSelected = currentMessage == static_cast<int>(meta.globalIndex);
             if (ImGui::Selectable(label.c_str(), isSelected))
-                currentMessage = meta.indexInFile;
+                currentMessage = static_cast<int>(meta.globalIndex);
             if (isSelected && selectionChanged) {
                 float itemMin = ImGui::GetItemRectMin().y;
                 float itemMax = ImGui::GetItemRectMax().y;
@@ -99,6 +102,13 @@ bool compareByKey(const GribMessageInfo& a,
             return a.typeOfFirstFixedSurface < b.typeOfFirstFixedSurface;
         case SortKey::IndexInFile:
             return a.indexInFile < b.indexInFile;
+        case SortKey::Step:
+            return a.step < b.step;
+        case SortKey::ValidityDateTime:
+            if (a.validityDate != b.validityDate) return a.validityDate < b.validityDate;
+            return a.validityTime < b.validityTime;
+        case SortKey::FileIdx:
+            return a.fileIdx < b.fileIdx;
     }
     return false;
 }
@@ -133,7 +143,7 @@ void gribSortWindow(bool* p_open,
     static std::vector<SortColumn> sortOrder;
 
     const char* items[] =
-    {   
+    {
         "Name",
         "ShortName",
         "IndicatorOfParameter",
@@ -145,7 +155,10 @@ void gribSortWindow(bool* p_open,
         "typeOfFirstFixedSurface",
         "Level",
         "PerturbationNumber",
-        "IndexInFile"
+        "IndexInFile",
+        "Step",
+        "ValidityDateTime",
+        "FileIdx"
     };
 
     if (ImGui::Button("Add Column"))

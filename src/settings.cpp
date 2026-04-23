@@ -11,7 +11,11 @@ bool operator==(const GribViewerSettings& lhs, const GribViewerSettings& rhs) {
         lhs.sqrtScale == rhs.sqrtScale &&
         lhs.useCustomMinMax == rhs.useCustomMinMax &&
         lhs.symmetricAroundZero == rhs.symmetricAroundZero &&
-        lhs.oldColorBug == rhs.oldColorBug
+        lhs.oldColorBug == rhs.oldColorBug &&
+        lhs.brightness == rhs.brightness &&
+        lhs.gamma == rhs.gamma &&
+        lhs.vibrancy == rhs.vibrancy &&
+        lhs.hueShift == rhs.hueShift
     );
 }
 
@@ -24,6 +28,10 @@ bool cmapUpgradeNeeded(const GribViewerSettings& oldSettings, const GribViewerSe
         oldSettings.sqrtScale != newSettings.sqrtScale ||
         oldSettings.discreteColors != newSettings.discreteColors ||
         oldSettings.colorCount != newSettings.colorCount ||
-        oldSettings.oldColorBug != newSettings.oldColorBug
+        oldSettings.oldColorBug != newSettings.oldColorBug ||
+        oldSettings.brightness != newSettings.brightness ||
+        oldSettings.gamma != newSettings.gamma ||
+        oldSettings.vibrancy != newSettings.vibrancy ||
+        oldSettings.hueShift != newSettings.hueShift
     );
 }

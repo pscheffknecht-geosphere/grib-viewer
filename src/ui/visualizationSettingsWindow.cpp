@@ -23,5 +23,18 @@ void visualizationSettingsWindow(GribViewerSettings& settings, GribField& field)
             settings.minVal = -absMax;
             settings.maxVal = absMax;
         }
+
+        ImGui::Separator();
+        ImGui::Text("HCL color adjustments:");
+        ImGui::SliderFloat("Brightness", &settings.brightness, 0.0f, 2.0f, "%.2f");
+        ImGui::SliderFloat("Gamma", &settings.gamma, 0.1f, 3.0f, "%.2f");
+        ImGui::SliderFloat("Vibrancy", &settings.vibrancy, 0.0f, 2.0f, "%.2f");
+        ImGui::SliderFloat("Hue shift", &settings.hueShift, -180.0f, 180.0f, "%.1f deg");
+        if (ImGui::Button("Reset HCL")) {
+            settings.brightness = 1.0f;
+            settings.gamma = 1.0f;
+            settings.vibrancy = 1.0f;
+            settings.hueShift = 0.0f;
+        }
     }
 }
